@@ -10,7 +10,6 @@
 module lc_ctrl
   import lc_ctrl_pkg::*;
   import lc_ctrl_reg_pkg::*;
-  import lc_ctrl_state_pkg::*;
 #(
   // Enable asynchronous transitions on alerts.
   parameter logic [NumAlerts-1:0] AlertAsyncOn = {NumAlerts{1'b1}},
@@ -207,8 +206,8 @@ module lc_ctrl
   logic          trans_invalid_error_d, trans_invalid_error_q;
   logic          token_invalid_error_d, token_invalid_error_q;
   logic          flash_rma_error_d, flash_rma_error_q;
-  logic          otp_prog_error_d, fatal_prog_error_q;
-  logic          state_invalid_error_d, fatal_state_error_q;
+  logic          otp_prog_error_d, otp_prog_error_q;
+  logic          state_invalid_error_d, state_invalid_error_q;
   logic          otp_part_error_q;
   logic [7:0]    sw_claim_transition_if_d, sw_claim_transition_if_q;
   logic [7:0]    tap_claim_transition_if_d, tap_claim_transition_if_q;
@@ -235,8 +234,8 @@ module lc_ctrl
     hw2reg.status.transition_error       = trans_invalid_error_q;
     hw2reg.status.token_error            = token_invalid_error_q;
     hw2reg.status.flash_rma_error        = flash_rma_error_q;
-    hw2reg.status.otp_error              = fatal_prog_error_q;
-    hw2reg.status.state_error            = fatal_state_error_q;
+    hw2reg.status.otp_error              = otp_prog_error_q;
+    hw2reg.status.state_error            = state_invalid_error_q;
     hw2reg.status.otp_partition_error    = otp_part_error_q;
     hw2reg.lc_state                      = dec_lc_state;
     hw2reg.lc_transition_cnt             = dec_lc_cnt;
@@ -319,8 +318,8 @@ module lc_ctrl
       trans_invalid_error_q     <= 1'b0;
       token_invalid_error_q     <= 1'b0;
       flash_rma_error_q         <= 1'b0;
-      fatal_prog_error_q        <= 1'b0;
-      fatal_state_error_q       <= 1'b0;
+      otp_prog_error_q          <= 1'b0;
+      state_invalid_error_q     <= 1'b0;
       sw_claim_transition_if_q  <= '0;
       tap_claim_transition_if_q <= '0;
       transition_token_q        <= '0;
@@ -333,8 +332,8 @@ module lc_ctrl
       trans_invalid_error_q     <= trans_invalid_error_d  | trans_invalid_error_q;
       token_invalid_error_q     <= token_invalid_error_d  | token_invalid_error_q;
       flash_rma_error_q         <= flash_rma_error_d      | flash_rma_error_q;
-      fatal_prog_error_q        <= otp_prog_error_d       | fatal_prog_error_q;
-      fatal_state_error_q       <= state_invalid_error_d  | fatal_state_error_q;
+      otp_prog_error_q          <= otp_prog_error_d       | otp_prog_error_q;
+      state_invalid_error_q     <= state_invalid_error_d  | state_invalid_error_q;
       otp_part_error_q          <= otp_lc_data_i.error    | otp_part_error_q;
       // Other regs, gated by mutex further below.
       sw_claim_transition_if_q  <= sw_claim_transition_if_d;
@@ -353,38 +352,36 @@ module lc_ctrl
   logic [NumAlerts-1:0] tap_alert_test;
 
   assign alerts = {
-    fatal_state_error_q,
-    fatal_prog_error_q
+    state_invalid_error_q,
+    otp_prog_error_q
   };
 
   assign alert_test = {
-    reg2hw.alert_test.fatal_state_error.q &
-    reg2hw.alert_test.fatal_state_error.qe,
-    reg2hw.alert_test.fatal_prog_error.q &
-    reg2hw.alert_test.fatal_prog_error.qe
+    reg2hw.alert_test.lc_state_failure.q &
+    reg2hw.alert_test.lc_state_failure.qe,
+    reg2hw.alert_test.lc_programming_failure.q &
+    reg2hw.alert_test.lc_programming_failure.qe
   };
 
    assign tap_alert_test = {
-    tap_reg2hw.alert_test.fatal_state_error.q &
-    tap_reg2hw.alert_test.fatal_state_error.qe,
-    tap_reg2hw.alert_test.fatal_prog_error.q &
-    tap_reg2hw.alert_test.fatal_prog_error.qe
+    tap_reg2hw.alert_test.lc_state_failure.q &
+    tap_reg2hw.alert_test.lc_state_failure.qe,
+    tap_reg2hw.alert_test.lc_programming_failure.q &
+    tap_reg2hw.alert_test.lc_programming_failure.qe
   };
 
   for (genvar k = 0; k < NumAlerts; k++) begin : gen_alert_tx
     prim_alert_sender #(
-      .AsyncOn(AlertAsyncOn[k]),
-      .IsFatal(1)
+      .AsyncOn(AlertAsyncOn[k])
     ) u_prim_alert_sender (
       .clk_i,
       .rst_ni,
-      .alert_test_i  ( alert_test[k] |
-                       tap_alert_test[k] ),
-      .alert_req_i   ( alerts[k]         ),
-      .alert_ack_o   (                   ),
-      .alert_state_o (                   ),
-      .alert_rx_i    ( alert_rx_i[k]     ),
-      .alert_tx_o    ( alert_tx_o[k]     )
+      .alert_req_i ( alerts[k]     |
+                     alert_test[k] |
+                     tap_alert_test[k] ),
+      .alert_ack_o (                 ),
+      .alert_rx_i  ( alert_rx_i[k]   ),
+      .alert_tx_o  ( alert_tx_o[k]   )
     );
   end
 
@@ -485,6 +482,8 @@ module lc_ctrl
     .lc_state_i             ( otp_lc_data_i.state             ),
     .lc_id_state_i          ( otp_lc_data_i.id_state          ),
     .lc_cnt_i               ( otp_lc_data_i.count             ),
+    .all_zero_token_i       ( otp_lc_data_i.all_zero_token    ),
+    .raw_unlock_token_i     ( otp_lc_data_i.raw_unlock_token  ),
     .test_unlock_token_i    ( otp_lc_data_i.test_unlock_token ),
     .test_exit_token_i      ( otp_lc_data_i.test_exit_token   ),
     .rma_token_i            ( otp_lc_data_i.rma_token         ),

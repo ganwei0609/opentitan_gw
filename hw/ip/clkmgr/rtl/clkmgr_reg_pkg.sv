@@ -9,9 +9,6 @@ package clkmgr_reg_pkg;
   // Param list
   parameter int NumGroups = 7;
 
-  // Address width within the block
-  parameter int BlockAw = 4;
-
   ////////////////////////////
   // Typedefs for registers //
   ////////////////////////////
@@ -62,9 +59,9 @@ package clkmgr_reg_pkg;
   } clkmgr_hw2reg_t;
 
   // Register Address
-  parameter logic [BlockAw-1:0] CLKMGR_CLK_ENABLES_OFFSET = 4'h 0;
-  parameter logic [BlockAw-1:0] CLKMGR_CLK_HINTS_OFFSET = 4'h 4;
-  parameter logic [BlockAw-1:0] CLKMGR_CLK_HINTS_STATUS_OFFSET = 4'h 8;
+  parameter logic [3:0] CLKMGR_CLK_ENABLES_OFFSET = 4'h 0;
+  parameter logic [3:0] CLKMGR_CLK_HINTS_OFFSET = 4'h 4;
+  parameter logic [3:0] CLKMGR_CLK_HINTS_STATUS_OFFSET = 4'h 8;
 
 
   // Register Index

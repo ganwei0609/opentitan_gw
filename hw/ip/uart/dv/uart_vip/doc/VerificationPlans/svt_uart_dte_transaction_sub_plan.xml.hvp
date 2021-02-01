@@ -1,0 +1,63 @@
+plan svt_uart_dte_transaction_sub_plan;
+  attribute string INST_NAME="";
+  feature transmitter;
+    feature To_capture_the_value_of_parity;
+      feature tx_parity____low_high_;
+        measure Group uart_svt;
+          source="group instance:*tx_parity.tx_parity**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_occurance_of_break_condition;
+      feature tx_break_condition____break_cond_;
+        measure Group uart_svt;
+          source="group instance:*tx_break_condition.tx_break_condition**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_payload_value_patterns;
+      feature tx_payload____all_zero_all_one_one_hot0_one_hot1_;
+        measure Group uart_svt;
+          source="group instance:*tx_payload.tx_payload**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_value_of_inter_cycle_delay_on_the_interface;
+      feature tx_inter_cycle_delay____zero_delay_low_range_mid_range_high_range_;
+        measure Group uart_svt;
+          source="group instance:*tx_inter_cycle_delay.tx_inter_cycle_delay**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+  feature receiver;
+    feature To_capture_the_value_of_parity;
+      feature rx_parity____low_high_;
+        measure Group uart_svt;
+          source="group instance:*rx_parity.rx_parity**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_occurance_of_break_condition;
+      feature rx_break_condition____break_cond_;
+        measure Group uart_svt;
+          source="group instance:*rx_break_condition.rx_break_condition**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_payload_value_patterns;
+      feature rx_payload____all_zero_all_one_one_hot0_one_hot1_;
+        measure Group uart_svt;
+          source="group instance:*rx_payload.rx_payload**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_value_of_inter_cycle_delay_on_the_interface;
+      feature rx_inter_cycle_delay____zero_delay_low_range_mid_range_high_range_;
+        measure Group uart_svt;
+          source="group instance:*rx_inter_cycle_delay.rx_inter_cycle_delay**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+endplan

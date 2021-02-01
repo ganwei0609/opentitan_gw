@@ -1,0 +1,12 @@
+
+`ifndef GUARD_SVT_UART_TXRX_SOURCE_UVM_SVI
+`define GUARD_SVT_UART_TXRX_SOURCE_UVM_SVI
+
+`include "svt_uart_source.uvm.svi"
+
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx_common)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx.uvm)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx_callback)
+
+`endif // GUARD_SVT_UART_TXRX_SOURCE_UVM_SVI
+

@@ -17,6 +17,7 @@ filesets:
       - uart_virtual_sequencer.sv: {is_include_file: true}
       - uart_scoreboard.sv: {is_include_file: true}
       - uart_env.sv: {is_include_file: true}
+      - uart_reset_if.svi: {is_include_file: true}
       - seq_lib/uart_vseq_list.sv: {is_include_file: true}
       - seq_lib/uart_base_vseq.sv: {is_include_file: true}
       - seq_lib/uart_smoke_vseq.sv: {is_include_file: true}
@@ -35,6 +36,7 @@ filesets:
       - seq_lib/uart_stress_all_vseq.sv: {is_include_file: true}
       - seq_lib/uart_tx_ovrd_vseq.sv: {is_include_file: true}
       - seq_lib/uart_long_xfer_wo_dly_vseq.sv: {is_include_file: true}
+
     file_type: systemVerilogSource
 
 generate:

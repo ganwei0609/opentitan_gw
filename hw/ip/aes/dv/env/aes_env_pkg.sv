@@ -22,7 +22,7 @@ package aes_env_pkg;
   `include "dv_macros.svh"
 
   // parameters
-  parameter string LIST_OF_ALERTS[] = {"recov_ctrl_update_err", "fatal_fault"};
+  parameter string LIST_OF_ALERTS[] = {"recoverable", "fatal"};
   parameter uint NUM_ALERTS = 2;
 
   typedef enum int { AES_CFG=0, AES_DATA=1, AES_ERR_INJ=2 } aes_item_type_e;
@@ -46,12 +46,10 @@ package aes_env_pkg;
   } cfg_error_type_t;
 
   typedef struct packed {
-    logic [31:7] unused;
-    logic        alert_fatal_fault;
-    logic        alert_recov_ctrl_update_err;
+    logic [31:5] unused;
+    logic        ctrl_error_storage;
     logic        input_ready;
     logic        output_valid;
-    logic        output_lost;
     logic        stall;
     logic        idle;
   } status_t;

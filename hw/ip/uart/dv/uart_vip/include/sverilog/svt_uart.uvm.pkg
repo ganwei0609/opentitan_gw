@@ -1,0 +1,65 @@
+//--------------------------------------------------------------------------
+// COPYRIGHT (C) 2012, 2013 SYNOPSYS INC.
+// This software and the associated documentation are confidential and
+// proprietary to Synopsys, Inc. Your use or disclosure of this software
+// is subject to the terms and conditions of a written license agreement
+// between you, or your company, and Synopsys, Inc. In the event of
+// publications, the following notice is applicable:
+//
+// ALL RIGHTS RESERVED
+//
+// The entire notice above must be reproduced on all authorized copies.
+//--------------------------------------------------------------------------
+`ifndef GUARD_SVT_UART_UVM_PKG
+ `define GUARD_SVT_UART_UVM_PKG
+  `ifndef SVT_UART
+  `define SVT_UART
+  `endif
+`ifdef DESIGNWARE_INCDIR
+  `define SVT_UART_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/common/latest/sverilog/include/svt_bootloader.svi`"
+  `include `SVT_UART_LOADER_FILE 
+  `include `SVT_SOURCE_MAP_LIB_INCLUDE_PKG(O-2018.09,svt.uvm)
+  `include `SVT_SOURCE_MAP_LIB_INCLUDE_PKG(O-2018.09,svt_bfm_shell.uvm)
+  `define SVT_UART_NVS_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/uart_svt/latest/sverilog/include/svt_uart_nvs_loader_utils.svi`"
+  `include `SVT_UART_NVS_LOADER_FILE 
+`else
+  // If the svt.uvm.pkg file has already been loaded, then we must still
+  // load svt_loader_util.svi so that the SVT_SOURCE_MAP_* macros can be defined correctly.
+  `include "svt.uvm.pkg"
+  `include "svt_bfm_shell.uvm.pkg"
+  `include "svt_uart_nvs_loader_utils.svi"
+`endif
+
+`include "svt_uart_if.svi"
+
+//--------------------------------------------------------------------------
+// Package svt_uart_uvm_pkg;
+//--------------------------------------------------------------------------
+package svt_uart_uvm_pkg;
+
+  import uvm_pkg::*;
+  import svt_uvm_pkg::*;
+`include "uvm_macros.svh"
+
+  import svt_bfm_shell_uvm_pkg::*;
+  // Type Definitions
+  typedef virtual svt_uart_if svt_uart_vif;
+
+`include "svt_uart_source.uvm.svi"
+`include `SVT_SOURCE_MAP_AGENT_INCLUDE_SVI(uart_svt,uart_agent_svt,O-2018.09,svt_uart_agent_source.uvm)
+endpackage : svt_uart_uvm_pkg
+ 
+`ifdef SVT_UART
+`ifndef __SVDOC__
+import svt_uart_uvm_pkg::*;
+`endif
+`endif
+`ifndef SVT_UART_UNIT_TEST
+`include "svt_uart_wrapper.svi"
+`endif
+`endif //  `ifndef GUARD_SVT_UART_UVM_PKG
+   
+//--------------------------------------------------------------------------
+//----------------------END OF FILE-----------------------------------------
+//--------------------------------------------------------------------------
+   

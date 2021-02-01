@@ -13,10 +13,14 @@ module otp_ctrl
   import otp_ctrl_part_pkg::*;
 #(
   // Enable asynchronous transitions on alerts.
-  parameter logic [NumAlerts-1:0] AlertAsyncOn = {NumAlerts{1'b1}},
+  parameter logic [NumAlerts-1:0] AlertAsyncOn      = {NumAlerts{1'b1}},
   // Compile time random constants, to be overriden by topgen.
-  parameter lfsr_seed_t RndCnstLfsrSeed = RndCnstLfsrSeedDefault,
-  parameter lfsr_perm_t RndCnstLfsrPerm = RndCnstLfsrPermDefault,
+  parameter lfsr_seed_t             RndCnstLfsrSeed       = RndCnstLfsrSeedDefault,
+  parameter lfsr_perm_t             RndCnstLfsrPerm       = RndCnstLfsrPermDefault,
+  parameter key_array_t             RndCnstKey            = RndCnstKeyDefault,
+  parameter digest_const_array_t    RndCnstDigestConst    = RndCnstDigestConstDefault,
+  parameter digest_iv_array_t       RndCnstDigestIV       = RndCnstDigestIVDefault,
+  parameter lc_ctrl_pkg::lc_token_t RndCnstRawUnlockToken = RndCnstRawUnlockTokenDefault,
   // Hexfile file to initialize the OTP macro.
   // Note that the hexdump needs to account for ECC.
   parameter MemInitFile = ""
@@ -345,26 +349,26 @@ module otp_ctrl
   otp_err_e [NumPart+1:0] part_error;
   logic [NumPart+1:0] part_errors_reduced;
   logic otp_operation_done, otp_error;
-  logic fatal_macro_error_d, fatal_macro_error_q;
-  logic fatal_check_error_d, fatal_check_error_q;
+  logic otp_macro_failure_d, otp_macro_failure_q;
+  logic otp_check_failure_d, otp_check_failure_q;
   logic chk_pending, chk_timeout;
   logic lfsr_fsm_err, key_deriv_fsm_err, scrmbl_fsm_err;
   always_comb begin : p_errors_alerts
     hw2reg.err_code = part_error;
     // Note: since these are all fatal alert events, we latch them and keep on sending
     // alert events via the alert senders. These regs can only be cleared via a system reset.
-    fatal_macro_error_d = fatal_macro_error_q;
-    fatal_check_error_d = fatal_check_error_q;
+    otp_macro_failure_d = otp_macro_failure_q;
+    otp_check_failure_d = otp_check_failure_q;
     // Aggregate all the errors from the partitions and the DAI/LCI
     for (int k = 0; k < NumPart+2; k++) begin
       // Set the error bit if the error status of the corresponding partition is nonzero.
       // Need to reverse the order here since the field enumeration in hw2reg.status is reversed.
       part_errors_reduced[NumPart+1-k] = |part_error[k];
       // Filter for critical error codes that should not occur in the field.
-      fatal_macro_error_d |= part_error[k] inside {MacroError, MacroEccUncorrError};
+      otp_macro_failure_d |= part_error[k] inside {MacroError, MacroEccUncorrError};
 
       // Filter for integrity and consistency check failures.
-      fatal_check_error_d |= part_error[k] inside {CheckFailError, FsmStateError} |
+      otp_check_failure_d |= part_error[k] inside {CheckFailError, FsmStateError} |
                              chk_timeout       |
                              lfsr_fsm_err      |
                              scrmbl_fsm_err    |
@@ -386,11 +390,11 @@ module otp_ctrl
 
   always_ff @(posedge clk_i or negedge rst_ni) begin : p_alert_regs
     if (!rst_ni) begin
-      fatal_macro_error_q <= '0;
-      fatal_check_error_q <= '0;
+      otp_macro_failure_q <= '0;
+      otp_check_failure_q <= '0;
     end else begin
-      fatal_macro_error_q <= fatal_macro_error_d;
-      fatal_check_error_q <= fatal_check_error_d;
+      otp_macro_failure_q <= otp_macro_failure_d;
+      otp_check_failure_q <= otp_check_failure_d;
     end
   end
 
@@ -432,30 +436,27 @@ module otp_ctrl
   logic [NumAlerts-1:0] alert_test;
 
   assign alerts = {
-    fatal_check_error_q,
-    fatal_macro_error_q
+    otp_check_failure_q,
+    otp_macro_failure_q
   };
 
   assign alert_test = {
-    reg2hw.alert_test.fatal_check_error.q &
-    reg2hw.alert_test.fatal_check_error.qe,
-    reg2hw.alert_test.fatal_macro_error.q &
-    reg2hw.alert_test.fatal_macro_error.qe
+    reg2hw.alert_test.otp_check_failure.q &
+    reg2hw.alert_test.otp_check_failure.qe,
+    reg2hw.alert_test.otp_macro_failure.q &
+    reg2hw.alert_test.otp_macro_failure.qe
   };
 
   for (genvar k = 0; k < NumAlerts; k++) begin : gen_alert_tx
     prim_alert_sender #(
-      .AsyncOn(AlertAsyncOn[k]),
-      .IsFatal(1)
+      .AsyncOn(AlertAsyncOn[k])
     ) u_prim_alert_sender (
       .clk_i,
       .rst_ni,
-      .alert_test_i  ( alert_test[k] ),
-      .alert_req_i   ( alerts[k]     ),
-      .alert_ack_o   (               ),
-      .alert_state_o (               ),
-      .alert_rx_i    ( alert_rx_i[k] ),
-      .alert_tx_o    ( alert_tx_o[k] )
+      .alert_req_i ( alerts[k] | alert_test[k] ),
+      .alert_ack_o (                 ),
+      .alert_rx_i  ( alert_rx_i[k]   ),
+      .alert_tx_o  ( alert_tx_o[k]   )
     );
   end
 
@@ -716,7 +717,11 @@ module otp_ctrl
   logic scrmbl_arb_req_ready, scrmbl_arb_rsp_valid;
   logic [NumAgents-1:0] part_scrmbl_req_ready, part_scrmbl_rsp_valid;
 
-  otp_ctrl_scrmbl u_scrmbl (
+  otp_ctrl_scrmbl #(
+    .RndCnstKey(RndCnstKey),
+    .RndCnstDigestConst(RndCnstDigestConst),
+    .RndCnstDigestIV(RndCnstDigestIV)
+  ) u_scrmbl (
     .clk_i,
     .rst_ni,
     .cmd_i         ( scrmbl_req_bundle.cmd       ),
@@ -738,6 +743,19 @@ module otp_ctrl
     part_scrmbl_req_ready[scrmbl_mtx_idx] = scrmbl_arb_req_ready;
     part_scrmbl_rsp_valid[scrmbl_mtx_idx] = scrmbl_arb_rsp_valid;
   end
+
+  /////////////////////////////////////////////
+  // Static fife cycle token precomputations //
+  /////////////////////////////////////////////
+
+  otp_ctrl_token_const #(
+    .RndCnstDigestConst    ( RndCnstDigestConst    ),
+    .RndCnstDigestIV       ( RndCnstDigestIV       ),
+    .RndCnstRawUnlockToken ( RndCnstRawUnlockToken )
+  ) u_otp_ctrl_token_const (
+    .all_zero_token_hashed_o   ( otp_lc_data_o.all_zero_token   ),
+    .raw_unlock_token_hashed_o ( otp_lc_data_o.raw_unlock_token )
+  );
 
   /////////////////////////////
   // Direct Access Interface //

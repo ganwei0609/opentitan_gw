@@ -1,0 +1,18 @@
+
+`ifndef GUARD_SVT_UART_MONITOR_SOURCE_OVM_SVI
+`define GUARD_SVT_UART_MONITOR_SOURCE_OVM_SVI
+
+`include "svt_uart_source.ovm.svi"
+
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_common)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_event_controller)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor.ovm)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_callback)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_xml_writer_callback)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_def_cov_data_callback)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_def_cov_callback)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_def_toggle_cov_data_callback)
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_def_toggle_cov_callback)
+    
+`endif // GUARD_SVT_UART_MONITOR_SOURCE_OVM_SVI
+

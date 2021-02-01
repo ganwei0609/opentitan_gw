@@ -1,0 +1,35 @@
+plan svt_uart_dte_exception_sub_plan;
+  attribute string INST_NAME="";
+  feature transmitter;
+    feature To_capture_the_occurence_of_parity_error;
+      feature tx_parity_error;
+        measure Group uart_svt;
+          source="group instance:*tx_parity_error.tx_parity_error**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature To_capture_the_occurence_of_framing_error;
+      feature tx_framing_error;
+        measure Group uart_svt;
+          source="group instance:*tx_framing_error.tx_framing_error**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+  feature receiver;
+    feature To_capture_the_occurence_of_parity_error;
+      feature rx_parity_error;
+        measure Group uart_svt;
+          source="group instance:*rx_parity_error.rx_parity_error**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature To_capture_the_occurence_of_framing_error;
+      feature rx_framing_error;
+        measure Group uart_svt;
+          source="group instance:*rx_framing_error.rx_framing_error**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+endplan

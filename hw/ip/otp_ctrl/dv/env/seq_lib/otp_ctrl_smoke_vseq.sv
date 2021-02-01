@@ -50,6 +50,7 @@ class otp_ctrl_smoke_vseq extends otp_ctrl_base_vseq;
 
   virtual task dut_init(string reset_kind = "HARD");
     super.dut_init(reset_kind);
+    cfg.lc_creator_seed_sw_rw_en_vif.drive(lc_ctrl_pkg::On);
     csr_wr(ral.intr_enable, en_intr);
   endtask
 
@@ -73,14 +74,21 @@ class otp_ctrl_smoke_vseq extends otp_ctrl_base_vseq;
       end
       do_otp_ctrl_init = 0;
 
+      // get otbn keys
+      req_otbn_key();
+
+      // get flash addr and data
+      req_flash_addr_key();
+      req_flash_data_key();
+
+      // get sram keys
+      req_all_sram_keys();
+
+
       for (int i = 0; i < num_dai_op; i++) begin
         bit [TL_DW-1:0] rdata0, rdata1;
-
+        `uvm_info(`gfn, $sformatf("starting dai access seq %0d/%0d", i, num_dai_op), UVM_DEBUG)
         `DV_CHECK_RANDOMIZE_FATAL(this)
-        // recalculate part_idx in case some test turn off constraint dai_wr_legal_addr_c
-        part_idx = get_part_index(dai_addr);
-        `uvm_info(`gfn, $sformatf("starting dai access seq %0d/%0d with addr %0h in partition %0d",
-                  i, num_dai_op, dai_addr, part_idx), UVM_DEBUG)
 
         // OTP write via DAI
         if ($urandom_range(0, 1)) begin
@@ -105,15 +113,13 @@ class otp_ctrl_smoke_vseq extends otp_ctrl_base_vseq;
         if ($urandom_range(0, 1)) csr_rd(.ptr(ral.status), .value(tlul_val));
       end
 
-      // lock digests
+      // lock HW digests
       `uvm_info(`gfn, "Trigger HW digest calculation", UVM_HIGH)
       cal_hw_digests();
       if ($urandom_range(0, 1)) csr_rd(.ptr(ral.status), .value(tlul_val));
       write_sw_digests();
       if ($urandom_range(0, 1)) csr_rd(.ptr(ral.status), .value(tlul_val));
       write_sw_rd_locks();
-
-      if ($urandom_range(0, 1)) rd_digests();
       dut_init();
 
       // read and check digest in scb

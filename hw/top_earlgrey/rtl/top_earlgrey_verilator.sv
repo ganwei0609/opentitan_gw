@@ -150,9 +150,10 @@ module top_earlgrey_verilator (
   );
 
   // UART DPI
-  // The baud rate set to match FPGA implementation; the frequency is "artificial". Both baud rate
-  // frequency must match the settings used in the on-chip software at
-  // `sw/device/lib/arch/device_sim_verilator.c`.
+  // The baud rate set to match FPGA implementation; the frequency is
+  // "artificial".
+  // Both baud rate and frequency must match the settings used in the on-chip
+  // software.
   uartdpi #(
     .BAUD('d7_200),
     .FREQ('d500_000)

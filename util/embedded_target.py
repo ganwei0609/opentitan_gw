@@ -20,7 +20,7 @@ def run_objdump(objdump, input, basename, outdir):
     f = open(output, "w")
     cmd = [
         objdump,
-        '--disassemble',
+        '--disassemble-all',
         '--headers',
         '--line-numbers',
         '--source',

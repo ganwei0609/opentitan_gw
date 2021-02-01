@@ -58,6 +58,7 @@
   // Default build and run opts
   build_opts: [// Standard UVM defines
                "+define+UVM",
+			   "+define+UVM_VERBOSITY=UVM_HIGH",
                "+define+UVM_NO_DEPRECATED",
                "+define+UVM_REGEX_NO_DPI",
                "+define+UVM_REG_ADDR_WIDTH={tl_aw}",
@@ -111,8 +112,6 @@
       name: smoke
       tests: []
       reseed: 1
-      // Knob used to configure an existing test / vseq to have a shorter runtime.
-      run_opts: ["+smoke_test=1"]
     }
 
     {

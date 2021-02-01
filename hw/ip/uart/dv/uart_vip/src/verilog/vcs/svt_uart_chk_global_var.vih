@@ -1,0 +1,335 @@
+//--------------------------------------------------------------------
+// Reg Declaration
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg			chk_clock_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 			chk_clk_start_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg			chk_clock_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 			chk_clk_start_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 			chk_clk_i_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg			baudX16;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 	[2:0]		uv_chk_parity;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 	[2:0]		present_state_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 	[2:0]	        present_state_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 	[3:0]		chk_counter_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg [31:0] sample_rate;
+reg [31:0] chk_sample_edge_u;
+reg [31:0] chk_sample_counter_u;
+reg [31:0] chk_sample_edge_d;
+reg [31:0] chk_sample_counter_d;
+reg [31:0] temp_sample_rate;
+reg [31:0] temp_sample_rate_1;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 	[3:0]		chk_counter_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg 			chk_clk_i_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg	[8:0]		chk_received_data_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg	[8:0]		chk_received_data_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg	[12:0]		chk_received_packet_u;
+reg                    chk_received_parity_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+reg	[12 :0]		chk_received_packet_d;
+reg                     chk_received_parity_d;
+
+reg [8:0]               data_pattern_inbound_off;
+reg [8:0]               data_pattern_inbound_on;
+//--------------------------------------------------------------------
+// To track the Sin Negedge (Start Bit)
+//--------------------------------------------------------------------
+reg                     chk_sin_negedge_det_u;
+//--------------------------------------------------------------------
+// To track the Sout Negedge (Start bit)
+//--------------------------------------------------------------------
+reg                     chk_sout_negedge_det_d;
+//--------------------------------------------------------------------
+// To track ongoing packetet in Downstream direction
+//--------------------------------------------------------------------
+reg                     get_packet_d_in_progress;
+//--------------------------------------------------------------------
+// To track ongoing packetet in Upstream direction
+//--------------------------------------------------------------------
+reg                     get_packet_u_in_progress;
+
+reg enable_chk_rts_cts_handshake;
+reg enable_chk_dtr_dsr_handshake;
+reg transmition_on;
+reg error_detected_u;
+reg chk_wait_for_xon_after_power_up;
+
+reg xon_detected;
+reg xoff_detected;
+
+
+reg mixed_mode_chk;
+
+reg bit_brk_con_u;
+reg bit_brk_con_d;
+reg framing_error_u;
+reg framing_error_d;
+reg parity_error_u;
+reg parity_error_d;
+
+reg chk_rule_enable;
+reg print_err_enable;
+
+reg resync_rx_at_each_byte;
+reg resync_u_device_receiver;
+reg allow_autoflow_trigger_rx_buffer;
+reg resync_d_device_receiver;
+reg disable_u_state_machine;
+reg disable_d_state_machine;
+integer pkt_cnt_to_send_xoff_pattern_chk;
+
+//--------------------------------------------------------------------
+// Integer Declaration
+//--------------------------------------------------------------------
+// receiver buffer size for inbound
+//--------------------------------------------------------------------
+integer 		receiver_buffer_size; 
+//--------------------------------------------------------------------
+// Packets transmitted
+//--------------------------------------------------------------------
+integer 		pkt_trans; 
+//--------------------------------------------------------------------
+// Packets received
+//--------------------------------------------------------------------
+integer 		pkt_rec; 
+//--------------------------------------------------------------------
+// Errors in transactions
+//--------------------------------------------------------------------
+integer 		error_count; 
+//--------------------------------------------------------------------
+// Warnings in transactions
+//--------------------------------------------------------------------
+integer 		warning_count; 
+//--------------------------------------------------------------------
+// Simulation time in minutes
+//--------------------------------------------------------------------
+integer 		time_count; 
+//--------------------------------------------------------------------
+// Crystal frequency
+//--------------------------------------------------------------------
+integer			crystal_freq;
+//--------------------------------------------------------------------
+// Baud rate
+//--------------------------------------------------------------------
+integer 		baud_rate;
+//--------------------------------------------------------------------
+// divisor
+//--------------------------------------------------------------------
+integer			divisor;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			counter;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			inbound_rx_counter_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			inbound_rx_counter_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			stop_bits;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			chk_wait_for_dsr;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			chk_max_wait_for_start_after_dtr_assertion;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+integer			start_cond_u;
+//--------------------------------------------------------------------
+integer			start_cond_d;
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+reg			chk_false_start_det_u;
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+reg			chk_false_start_det_d;
+//--------------------------------------------------------------------
+//To store the start time of the Upstream Packet
+real                    packet_start_time_u;
+//To store the end time of the Upstream Packet
+real                    packet_end_time_u;
+//To store the start time of the Downstream Packet
+real                    packet_start_time_d;
+//To store the end time of the Downstream Packet
+real                    packet_end_time_d;
+
+integer delay_between_off_on;
+
+integer max_delay_to_xon_after_xoff;
+
+//--------------------------------------------------------------------
+// Event Declaration
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+event 			event_start_detected_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+event 			event_stop_detected_u;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+event 			event_start_detected_d;
+//--------------------------------------------------------------------
+// 
+//--------------------------------------------------------------------
+event 			event_stop_detected_d;
+event 			event_cts_rts_observed_stop_detected_d;
+
+event 			event_xoff_detected;
+
+event 			event_xon_detected;
+event                   event_invalid_trans_bet_off_on_d;
+// Notify to record packet start time for upstream packet.
+event                   event_record_start_time_u;
+// Notify to record packet start time for downstream packet.
+event                   event_record_start_time_d;
+
+event                   event_wait_lic_checkout;
+event                   event_lic_checkedout;
+event                   event_data_bit_rcvd;
+reg mode_of_operation;
+reg [3:0] chk_data_width;
+reg [2:0] chk_stop_bits;
+reg [1:0] chk_uv_parity_bits;
+
+integer 	  packet_count_size;
+
+integer 	  dtr_assertion_delay;
+
+integer 	  dsr_assertion_delay;
+
+integer 	  rts_deasrt_asrt_delay;
+
+integer 	  cts_deasrt_asrt_delay;
+
+integer 	  sin_delay;
+
+integer 	  sout_delay;
+
+integer 	  rts_cts_delay;
+
+integer 	  dtr_dsr_delay;
+
+integer packet_count_bfr_cts_deassert;  
+
+integer packet_count_bfr_rts_deassert;  
+integer           i;
+
+reg               flag_data_transfer;
+
+reg receive_half_stop_bit_u;
+reg half_stop_bit_rcvd_u;
+reg receive_half_stop_bit_d;
+reg half_stop_bit_rcvd_d;
+
+//rs485 checker variables
+reg chk_enable_rs485; 
+reg chk_de_polarity; 
+reg chk_re_polarity;
+reg [7:0]chk_de_assertion_delay;
+reg [7:0]chk_de_deassertion_delay;
+reg [15:0]chk_de_to_re_TAT;
+reg [15:0]chk_re_to_de_TAT;
+//reg [7:0]chk_re_assertion_delay;
+//reg [7:0]chk_re_deassertion_delay;
+reg [7:0]count_chk_de_assertion_delay;
+reg [7:0]count_chk_de_deassertion_delay;
+reg [15:0]count_chk_de_to_re_TAT;
+reg [15:0]count_chk_re_to_de_TAT;
+//reg [7:0]count_chk_re_assertion_delay;
+//reg [7:0]count_chk_re_deassertion_delay;
+// UART RS485 : FULL DUPLEX or HALF DUPLEX
+reg chk_rs485_transfer_mode;
+
+event end_of_pkt_sent;
+event dtr_asserted;
+event dsr_asserted;
+event sin_started;
+event sout_started;
+event rts_asserted;
+event cts_asserted;
+event cts_asserted_aftr_rts;
+event dsr_asserted_aftr_dtr;
+event event_chk_pkt_stop_u;
+event chk_data_received_u;
+event chk_data_received_d;
+event pkt_rcvd_bfr_cts_deassert;
+event pkt_rcvd_bfr_rts_deassert;
+
+
+event event_chk_false_start_det_u;
+event event_chk_false_start_det_d;
+
+event event_data_chk_comp_u;
+event event_data_chk_comp_d;
+ 
+parameter UART_DEVICE_TYPE = 0;
+//vcs_vip_protect 
+`protected
+L4/CFZI<b/\AgM1O;AH8=.SGXgc&e)S.]4]g\]^6PO9CB;(OCQ[C5(SI_.,g)?2S
+OQE\8)#&^,0A*$
+`endprotected
+
+
+//*************************************END OF FILE*******************************************
+

@@ -1,0 +1,33 @@
+
+`ifndef GUARD_SVT_UART_XTOR_UVM_PKG
+`define GUARD_SVT_UART_XTOR_UVM_PKG
+
+`ifdef UART_ZEBUMODE
+`include "svt.uvm.pkg"
+`include "svt_bfm_shell.uvm.pkg"
+`include "svt_uart.uvm.pkg"
+
+package svt_uart_xtor_uvm_pkg;
+
+  import uvm_pkg::*;
+  import svt_uvm_pkg::*;
+  import svt_bfm_shell_uvm_pkg::*;
+  import svt_uart_uvm_pkg::*;
+  `include "svt_uart_txrx_xtor_common.sv"
+
+`ifndef SVT_OLD_ZEBU
+  export "DPI-C" function svt_uart_frmXtor_dpi_get_xtor_name;
+  export "DPI-C" function svt_uart_frmXtor_dpi_receive;
+  
+  function string svt_uart_frmXtor_dpi_get_xtor_name(chandle xtor);
+    return svt_uart_txrx_xtor_common::m_map_by_chandle[xtor].uart_cfg.hw_xtor_cfg.inst;
+  endfunction
+  
+  function void svt_uart_frmXtor_dpi_receive(chandle xtor, byte data);
+    svt_uart_txrx_xtor_common::m_map_by_chandle[xtor].receive(data);
+  endfunction
+`endif
+endpackage
+`endif
+`endif
+

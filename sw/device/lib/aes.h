@@ -9,11 +9,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// TODO:
-// 1) Refactor to use use dif_aes.
-// 2) Verify that test still works.
-// 3) Use dif_aes directly in the test (probably remove this file).
-
 /**
  * Supported AES operation modes: encode or decode.
  */

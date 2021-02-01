@@ -2,43 +2,6 @@
 # Licensed under the Apache License, Version 2.0, see LICENSE for details.
 # SPDX-License-Identifier: Apache-2.0
 
-sw_sca_aes_serial_sca  = declare_dependency(
-  link_with: static_library(
-    'aes_serial_sca',
-    sources: ['sca.c'],
-    dependencies: [
-      sw_lib_dif_gpio,
-      sw_lib_dif_rv_timer,
-      sw_lib_dif_uart,
-      sw_lib_irq,
-      sw_lib_irq_handlers,
-      sw_lib_mmio,
-      sw_lib_pinmux,
-      sw_lib_runtime_log,
-    ],
-  ),
-)
-
-sw_sca_aes_serial_prng = declare_dependency(
-  link_with: static_library(
-    'aes_serial_prng',
-    sources: ['prng.c'],
-  ),
-)
-
-sw_sca_aes_serial_simple_serial = declare_dependency(
-  link_with: static_library(
-    'aes_serial_simple_serial',
-    sources: ['simple_serial.c'],
-    dependencies: [
-      sw_lib_dif_uart,
-      sw_lib_mmio,
-      sw_lib_runtime_print,
-      sw_sca_aes_serial_prng,
-    ]
-  ),
-)
-
 foreach device_name, device_lib : sw_lib_arch_core_devices
   aes_serial_elf = executable(
     'aes_serial_' + device_name,
@@ -46,14 +9,17 @@ foreach device_name, device_lib : sw_lib_arch_core_devices
     name_suffix: 'elf',
     dependencies: [
       device_lib,
+      sw_lib_dif_rv_timer,
       riscv_crt,
       sw_lib_aes,
-      sw_lib_mmio,
-      sw_lib_runtime_hart,
       sw_lib_runtime_log,
-      sw_sca_aes_serial_prng,
-      sw_sca_aes_serial_sca,
-      sw_sca_aes_serial_simple_serial,
+      sw_lib_dif_gpio,
+      sw_lib_irq_handlers,
+      sw_lib_irq,
+      sw_lib_mmio,
+      sw_lib_pinmux,
+      sw_lib_runtime_hart,
+      sw_lib_dif_uart,
     ],
   )
 

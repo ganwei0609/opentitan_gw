@@ -1,0 +1,89 @@
+
+//---------------------------------------------------------------------
+// This confidential and proprietary software may be used only as
+// authorized by a licensing agreement from nSys
+// In the event of publication, the following notice is applicable:
+//
+// (C) Copyright 2005-2010 nSys Design Systems
+// All rights reserved
+//
+// The entire notice above must be reproduced on all authorized copies
+//
+// Model Name     : UART VIP    
+// Module         : nvs_uv_chk_lic
+// Tasks          : check_out_license
+// Functions      : None
+//
+// $Source: /tmp/nvs_uart/chk/nvs_uv_chk_lic.vih,v $
+// $Author: nikhil $
+// $Date: 2010-06-08 06:33:29 $
+// $Revision: 1.22 $
+// Abstract       : In this checker module, a task is implemented to 
+//                  check out lecense for checker
+//
+// Packages/module called (if any ): None
+//
+// Platforms and tool version used : 
+//----------------------------------------------------------------------
+`protected
+<&0\L,g<D+D+TY;66;La]OG([cb9)RUCdJ3Ed(G_;-,G+cXCN<@a4)S;-Mf^=EM=
+8-E&Z,@.])DVX(ZNA&Ba&SaNTcJ]#?:A1.[AK:LTOP,I(-Z>#QTR>U6\R;?6K8d?
+(75?;WS2-HMa_3\XZ+K+cZ^7V=+>_JaB/OA1@1/3L(EA&gVUR+WM;PB5)[.Pg@56
+K]dc?0N1DbSPgN.3Jc.VC,+MN;e;OFRJ@:U6<5#TY]a3SIXc6:Q4&TO^_6K=g\We
+#cR_:..+6SK7@LV]Bf-R#;Xb@A;[PBTXQU)[[6(Ya-Cd9b3>L[d-KO+^C?5.4]CC
+G^76X(O^,]:.?@;aac6#;0B+Y<fWbDPNPB(6f]A0EKWBOcd.52.(Ud/36DGEBg72
+VO&gZ6SSd8#a,(WQI7L9ec/6P3.PH5(Q_G@J>E22Yde1RXPGRP@<#MaL;cMDf1QS
+O9A6Bc.6@d;)MDE,8WEfa,V?FR\73GWAdUcgNd7R9Q=-:cL^ggVF5bNI&\Y/Y)g#
+)_BfGM1@f-S<7)^a-0NE&T2)A^8=T05eH6A@N/^RJ7>JNL8aLH)JE&#N0\?XU(\\
+T##P94dHP8E,D?^=)Y,#gNTUBU@HIG83(<+[)YO7@aTeC&IK>0bV]LHBc]M\g\=Y
+/[Hg@;()IBWFMg&CO1I/4KO_EfC(.X><(:T.:CES7<]L\=1ISc2GaSNC?G2Q8_fS
+e#bHaf8+N3VZ6>7)B-f,AR,?Q.V)38Y=+SZ([dX+KG?+H=/2&gL^?S([D^-1V,f/
+7O4PH6J[F(A99XQ;^)38+UP?B+953@\>4E92C_7FRIN6aXKIUHGUUWe:d6a,8SF0
+.1RX1Ng2f8S+?8@+AJdN-O>+L)76KJ.c<Yd@E.caH]]<MY=3)\118-X8>3bGY.T.
+eL&IdF,:gd0BZ<P&J)ZadbYH=L+/9b)5VMX3OZ)e?X>\;FBNUIdbMYC,9BOEe_b1
+GcRJAdMYg9\eD.CAg2K3>3bGS7Q75>5K=TYX-KC,d=0AQ_=Y_<T3Je@X65DC]AXC
+^Jg-O#A/)1S]9Ad1dgeM+/?Z0JQX^E25b#b\6]K&06^M.Od+&O\>18SdIN3Y,L<N
+MRSf1GKMa-&_Y>cT?7=RJ@@e0LJ)Z0&05gZMEO-[:N(7RR_MR5YP;H(<M/BU2#9+
+dH9HZTH.(c?&?d.S5K..A<=A[?a;J;fL]ULB,><[PHGEXN]9IcGQ@Ze1+9U0cU_P
+VN,QbVfN>+&H/TQ;a6RO&9C<508FTMWgd>[+HNcKK-<JgDdbFCZ/374P^>#eZ4V6
+9NJXXM/0+WYE?&5/f112ZLagWHT>&&AT1#A8V\>5Z#+N3:fV,U4K^7D6WL0&9+YJ
+:&Gd\aK),f/+0e2YI5d]Y9_Fc7Y.=)IG7CFT8cQ@gA^<]W_BCQcQ&Bg3[G:NT//N
+L+aQU5b;W:-7F+:e_12-JTEEP[/HceJbFFG\4F2Ig;EHPI>IOa4(/)I8J0bKZ>;G
++Q>?Gb7,5.CKQALSAc^HLM>1Z\<bIbD+&=_DB^9JYUK8Z_(a3_6_Y5/-]5U=U>/c
+JcGBeCS=#YeV49OLM&V#1:J,BO=<FbNQe+(KP7I81cN,<d8]A9bTGH,K1.>H,_.B
+#H_Wb)STB9/^IANCJ[T^U]PP+ZYD[:=]^7?TCI3^F1c8F(BIa5eLNL\9#I?g#HE7
+QRDY&5)@S<#HJZd=.<VBX(ZA][6<,e-0&aU(X&ORDT2&VL-cFG]T5;cNQ:CAZJ0N
+FXOHWL1BK)YEQVbeH+ZRg?8HaM\[bWDI4EOMbPA8FLOM#_GSQ4fFfWG<&g#(HLKc
+(28+(GLe,.^EY<IEOQ2/QG)7\+WDKEL.(E_Y38=<)UH\[C3M#ge;gW2<\RM32NdW
+cI226OO&-c3U@c#DP>=4@f::JCe,3-=EZK[^^A_.9e_T1Kg]?3#]e]OaL&\I#V6?
+e@a.Cd<RID1ZYX>E[fd[<2P>BL0A=ae,7]eX8aYbd0AFdF@79Ub^A4eUVKZ7)JNd
+YGXW^+M>=2-_<<NDG^07#d2Qg7_7RA]B[a9Y-0P\AN-XMYL31WMYQ_A>?B&_Z.#(
+-BSaeM>]RS0Da<Ia5eLeBJP5;BM+Q/:aZ6aBG^8KQQBEK<OQJEP\8\\g?eG<+,&\
+P46/_GVM<Q@E2\_Fd65[GPXWaJRGREXIA33.;ZT+AVH76(a.J,\1\O&5c(4Q&>_^
+K29VM_#VgU0D:UQEaNQ6NVQJeM7Y.+g-XHWBaSW(4e58=H6D327KYNFM5:TZY.;@
+&B@_5QTOH1(TNAC@4A/VW;I2D3I0^a5Z^I)1IZ[K:W6?G\T8RQ8-HAe6X&b>a#g5
++?5Q?-]NeF&3>\V3@<H#99O>=LSbgN>\D+OAV,QcUJYeDIb::T_^?SI2MeF(Y;&]
+LM;Ve1MXe2-G^RO_HH^L&:(D6?eD>YV7d>R70C]OXaL,1L;44\881@QJS663JWMe
+.@U_[=^V?B0I;M3,L=,#?;,;c,WKHbUK=:&FJ?2=I(WRd2dNf+c3+1+BUH\P;8J;
+-8LC4JeK+<B2Cc.<8(#V#OF1OC<D)39-0NUAE^bNIE_WFa3Xa(V5c11=P;4;0\U3
+4Y?XI>BD]QJ-++++[EFS=_,:SS8O9NcR=&-:QNE/B:#\SL:O0?X3[:SWDQTP^BI>
+.>>IRX7-F]dX^e:_\]P;QI=afP=E[C4^a.a#AK9e6O\&8/B&C;;F+XbAXT;<.,6<
+));UMHF04#U(ROdXdI\)L0LT;^KI/MT&70BF7\ee_b-UfE:7?K\ag_6S,ORg,Sa&
+Z5X<:08g^(T/8XJJQ<]IO<8=a__LGVGX^;[>Y5_Z=RS-VD@d8@@B-XBQGZ/DR;FL
+a?>K6Y:d5>XL(DSU94:F[L^NSe7dH[ZdQ?:XLKf\RA?TC(c(XMI4K1UK5#Y9]1_[
+T<&M8-;aK(Pd0YZ?X#&Q\dd=8#E?)df:>-&b8R5Wa?A=P4P=9:[FH\GV&XC=20JN
+@PUFL?9#-#fKD3KG-H=Q[#HPR];CE^X=.4c4&GPZZeG(9A/VeH4-.LF,C1HY4+eJ
+P9+&>?4N0FX.11b[@_Z+?JS9./5]ea[8HV1AWfHI694YLECKIY)ecNLWKEO5I08O
+,#&M+^5c(\R^>6Mc]6>,9)e[dMI1T\]QE__cYdZF,gX<<gfMQ/HVg<SA+?^T(O0d
+?M\^YL^B_d0:)W(CXLBCeRT+AX(52[DA<##X:PgI#[gLT9A6I^LOJa@NCG/RT+@O
+G50@1T4RNFd4c77e3Mf4Eff\dSR0<[5BH,M-&P7S.-6Hg8.gM9@79dg/KV/E4L^b
+K;<J7^4a34(9K<M,6(<;6=@_@S5^CPX7#,ZL@@AYZ:cg<<?a^&W\MKIdbVSIM2N&
+8V0Z?S8[Y8Ya:cgZJ\FD.2,,&dY=IP_RQbQ\X-=@Na0e7>,BeF4-;YKU2>BW5+d.
+]M4YXN747X0L4UX<f^]6E#8eHSF2]9D);$
+`endprotected
+
+
+
+
+//*************************************END OF FILE*******************************************
+

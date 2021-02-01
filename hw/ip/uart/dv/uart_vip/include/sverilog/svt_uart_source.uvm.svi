@@ -1,0 +1,32 @@
+
+`ifndef GUARD_SVT_UART_SOURCE_UVM_SVI
+`define GUARD_SVT_UART_SOURCE_UVM_SVI
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_err_check)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_xtor_configuration)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_configuration)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_agent_configuration)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_transaction)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_transaction_exception)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_transaction_exception_list)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_pattern_sequence_collection)
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_monitor_event_data) 
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_dce_transaction_sequence_collection) 
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_dte_transaction_sequence_collection) 
+
+`endif // GUARD_SVT_UART_SOURCE_UVM_SVI
+
+
+//----------------------------------------------------------------------------
+//--------------------------END OF FILE---------------------------------------
+//----------------------------------------------------------------------------

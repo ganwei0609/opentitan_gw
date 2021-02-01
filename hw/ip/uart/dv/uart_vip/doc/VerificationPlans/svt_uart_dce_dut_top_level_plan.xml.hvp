@@ -1,0 +1,20 @@
+`include "svt_uart_dce_transaction_sub_plan.xml.hvp"
+`include "svt_uart_dce_pattern_sub_plan.xml.hvp"
+`include "svt_uart_dce_toggle_sub_plan.xml.hvp"
+`include "svt_uart_dce_exception_sub_plan.xml.hvp"
+plan svt_uart_dce_dut_top_level_plan;
+  feature DCE;
+    feature Capture_various_fields_of_transaction_on_UART_interface;
+      subplan svt_uart_dce_transaction_sub_plan #(INST_NAME="dce_agent");
+    endfeature
+    feature Capture_patterns_corresponding_to_sequences_of_transactions_and_specific_field_values_within_these_transactions;
+      subplan svt_uart_dce_pattern_sub_plan #(INST_NAME="dce_agent");
+    endfeature
+    feature Capture_the_transition_form_0_to_1_and_1_to_0_of_the_individual_interface_signals;
+      subplan svt_uart_dce_toggle_sub_plan #(INST_NAME="dce_agent");
+    endfeature
+    feature Capture_the_error_scenarios_occuring_during_the_transaction;
+      subplan svt_uart_dce_exception_sub_plan #(INST_NAME="dce_agent");
+    endfeature
+  endfeature
+endplan

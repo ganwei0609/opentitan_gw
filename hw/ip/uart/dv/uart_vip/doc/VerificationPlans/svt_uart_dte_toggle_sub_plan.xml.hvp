@@ -1,0 +1,33 @@
+plan svt_uart_dte_toggle_sub_plan;
+  attribute string INST_NAME="";
+  feature interface_signal;
+    feature Capture_the_toggling_of_DTR_signal;
+      feature DTR;
+        measure Group uart_svt;
+          source="group instance:*svt_toggle_cov_bit**dtr_signal_toggle_**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_toggling_of_DSR_signal;
+      feature DSR;
+        measure Group uart_svt;
+          source="group instance:*svt_toggle_cov_bit**dsr_signal_toggle_**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_toggling_of_RTS_signal;
+      feature RTS;
+        measure Group uart_svt;
+          source="group instance:*svt_toggle_cov_bit**rts_signal_toggle_**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+    feature Capture_the_toggling_of_CTS_signal;
+      feature CTS;
+        measure Group uart_svt;
+          source="group instance:*svt_toggle_cov_bit**cts_signal_toggle_**${INST_NAME}";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+endplan

@@ -1,0 +1,188 @@
+
+`ifndef GUARD_SVT_UART_IF_SVI
+`define GUARD_SVT_UART_IF_SVI
+//Added inclusion of VIP loader file to avoid compilation issues if VIP package is not included before VIP interface
+`ifndef SVT_UART
+`define SVT_UART
+`endif
+`ifdef DESIGNWARE_INCDIR
+  `define SVT_UART_NVS_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/uart_svt/latest/sverilog/include/svt_uart_nvs_loader_utils.svi`"
+  `include `SVT_UART_NVS_LOADER_FILE 
+`else
+  // If the svt.ovm.pkg file has already been loaded, then we must still
+  // load svt_loader_util.svi so that the SVT_SOURCE_MAP_* macros can be defined correctly.
+  `include "svt_uart_nvs_loader_utils.svi"
+`endif
+
+`include "svt_uart_defines.svi"
+/** @cond PRIVATE */
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_bfm_if) 
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_mon_if) 
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_chk_if) 
+/** @endcond */
+
+
+/**
+ * This SystemVerilog 'interface' definition declares all of the signals (scoped within an instance 
+ * of this interface) that are specified by the UART Protocol. <br/>
+ * The interface declares 'modports' that are to be used as logical port connections for the 
+ * components. <br/>
+ * 
+ * Interface required Clock Signal as input argument. Clock Signal should be generated from the 
+ * testbench. Input clock signal 'clk' is used as reference clock. <br/>
+ * 
+ * The Baud Rate Generator divides this clock by a divisor programmable from 1 to (2^16 - 1) to provide output baud clock. <br/>
+ * 
+ * The divisor can be configured through "baud_divisor", present in svt_uart_configuration class.
+ */
+interface svt_uart_if (input bit clk);
+   
+  /** This port is for reset: the UART SVT supports positive edge reset */
+  bit rst;
+  
+  /** This port is used as a Serial data port. This is output from DCE and input to DTE. */
+  wire sin;
+  
+  /** 
+   * This port is Data Set Ready (DSR) Port. This is output from DCE and input to DTE.
+   * 
+   * When active (pin is low), DSR indicates to DTE that DCE is ready to exchange data.
+   * 
+   * When "enable_dtr_dsr_handshake" (present in svt_uart_configuration class) is 
+   * set to 1'b0, the value of dsr pin is don't care. 
+   * 
+   * This pin is not relevant when handshake type is SOFTWARE and
+   * is used only in HARDWARE handshake type. The handshake type can be configured 
+   * through "handshake_type", present in svt_uart_configuration_class.
+   */
+  wire dsr;
+  
+  /** 
+   * This port is Clear to send (CTS) port. This is output from DCE and input to DTE when 
+   * "enable_tx_rx_handshake" (present in svt_uart_configuration class) is set to 1'b0 
+   * and input to both DTE and DCE when "enable_tx_rx_handshake" is set to 1'b1.
+   * 
+   * This pin is not relevant when handshake type is SOFTWARE and
+   * is used only in HARDWARE handshake type.
+   * 
+   * The handshake type can be configured through "handshake_type", present
+   * in svt_uart_configuration_class.
+   * 
+   * When "enable_rts_cts_handshake" (present in svt_uart_configuration class) is 
+   * set to 1'b0, the value of cts pin is don't care.
+   */
+  wire cts;
+  
+  /** 
+   * This port is Data Terminal Ready (DTR) Port. This is output from DTE and input to DCE.
+   * 
+   * When active (pin is low) DTR indicates to DCE that DTE is ready to exchange data.
+   * 
+   * When "enable_dtr_dsr_handshake" (present in svt_uart_configuration class) is 
+   * set to 1'b0, the value of dtr pin is don't care.
+   * 
+   * This pin is not relevant when handshake type is SOFTWARE and
+   * is used only in HARDWARE handshake type.
+   * 
+   * The handshake type can be configured through "handshake_type", present
+   * in svt_uart_configuration_class.
+   */
+  wire dtr;
+  
+  /** 
+   * This port is Request To Send (RTS) port. This is output from DTE and input to DCE when
+   * "enable_tx_rx_handshake" (present in svt_uart_configuration class) is set to 1'b0 
+   * and output of both DTE and DCE when "enable_tx_rx_handshake" is set to 1'b1.
+   * 
+   * This pin is not relevant when handshake type is SOFTWARE and is used only 
+   * in HARDWARE handshake type.
+   * 
+   * The handshake type can be configured through "handshake_type", present
+   * in svt_uart_configuration_class.
+   * 
+   * When "enable_rts_cts_handshake" (present in svt_uart_configuration class) is set 
+   * to 1'b0, the value of rts pin is don't care.
+   */ 
+  wire rts;
+  
+  /** This port is used as a Serial data port. This is output from DTE and input to DCE. */
+  wire sout;
+  
+  /** 
+   * baudout pin drives the output of baud rate generator of vip, i.e. the baud rate clock for 
+   * general purpose system use.
+   * 
+   * VIP drives baudout pin only when "enable_drive_baudout_pin" 
+   * (present in svt_uart_configuration class) is set to 1'b1
+   */
+  wire baudout;
+
+`ifdef SVT_UART_GPIO                        
+  // General Purpose Input Pins
+  wire gpi0;
+  wire gpi1;
+  wire gpi2;
+  wire gpi3;
+  wire gpi4;
+
+  // General Purpose output Pins
+  wire gpo0;
+  wire gpo1;
+  wire gpo2;
+  wire gpo3;
+  wire gpo4;
+`endif                        
+  
+/** @cond PRIVATE */
+  // Interfaces required for Verilog-SV communication 
+  `SVT_UART_BFM_IF   bfm_if      () ;
+  `SVT_UART_MON_IF   bfm_mon_if  () ; 
+  `SVT_UART_CHK_IF   bfm_chk_if  () ;
+  //function void set_full_name(string fullname);
+  //  bfm_if.set_full_name(fullname);
+  //endfunction // set_full_name
+
+  //function void set_enable_traffic_log(bit enable_traffic_log);
+  //  bfm_if.set_enable_traffic_log(enable_traffic_log);
+  //endfunction
+   
+  /** Modport for UART DTE */
+  modport svt_uart_txrx_dte_modport ( 
+   input  rst     ,      
+   input  clk     ,    
+   output sout    ,   
+   output dtr     ,   
+   output rts     ,   
+   input  sin     ,  
+   input  dsr     , 
+   input  cts     ,
+   output baudout);         
+  
+  /** Modport for UART DCE */
+  modport svt_uart_txrx_dce_modport ( 
+   input  rst     ,       
+   input  clk     ,
+   input  sout    ,
+   input  dtr     ,
+   input  rts     ,
+   output sin     ,
+   output dsr     ,
+   output cts     ,
+   output baudout);
+/** @endcond  */  
+  /** Modport for UART Monitor */
+  modport svt_uart_monitor_modport (
+   input  rst     ,       
+   input  clk     ,
+   input  sout    ,
+   input  dtr     ,
+   input  rts     ,
+   input  sin     ,
+   input  dsr     ,
+   input  cts     ,
+   input  baudout);         
+  
+endinterface
+
+`endif //  `ifndef GUARD_SVT_UART_IF_SVI
+

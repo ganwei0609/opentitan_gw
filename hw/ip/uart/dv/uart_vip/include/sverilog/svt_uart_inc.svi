@@ -1,0 +1,41 @@
+
+`ifdef SVT_UART_VERILOG_TECHNOLOGY
+`define SVT_UART
+
+`ifdef DESIGNWARE_INCDIR
+  `ifndef UV_PROTECT
+  `define UV_PROTECT
+  `endif
+  `define SVT_UART_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/common/latest/sverilog/include/svt_bootloader.svi`"
+  `include `SVT_UART_LOADER_FILE 
+  `define SVT_UART_NVS_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/uart_svt/latest/sverilog/include/svt_uart_nvs_loader_utils.svi`"
+  `include `SVT_UART_NVS_LOADER_FILE 
+  `include `SVT_SOURCE_MAP_LIB_INCLUDE_PKG(O-2018.09,svt.uvm)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_gen)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_mon)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_chk)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_common_define)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_bfm_define)
+  `include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_chk_define)
+  `include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_pool)
+  `include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_bfm)
+  `include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_checker)
+  `include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_mon_txrx)
+  `include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_monitor)
+`else
+  `include "svt_uart_nvs_loader_utils.svi"
+  `include "svt.uvm.pkg"
+  `include "svt_uart_lib_gen.h"
+  `include "svt_uart_lib_mon.h"
+  `include "svt_uart_lib_chk.h"
+  `include "svt_uart_common_define.h"
+  `include "svt_uart_bfm_define.h"
+  `include "svt_uart_chk_define.h"
+  `include "svt_uart_pool.v"
+  `include "svt_uart_bfm.v"
+  `include "svt_uart_checker.v"
+  `include "svt_uart_mon_txrx.v"
+  `include "svt_uart_monitor.v"
+`endif
+`endif
+

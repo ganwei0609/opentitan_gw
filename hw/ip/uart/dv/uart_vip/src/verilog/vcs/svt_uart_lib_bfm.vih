@@ -1,0 +1,142 @@
+//----------------------------------------------------------------------
+// PARAMETERS 
+//----------------------------------------------------------------------
+parameter UV_NVS_MAX_DATA_ARR_SIZE = 8020;
+
+//----------------------------------------------------------------------
+// Global variables
+//----------------------------------------------------------------------
+integer       mode_pkt_sz;
+integer       mode_byte_en_pkt_sz;
+integer       nvs_last_data_index;
+//----------------------------------------------------------------------
+// REG DEFINITIONS
+//----------------------------------------------------------------------
+reg [8:0]     nvs_data[UV_NVS_MAX_DATA_ARR_SIZE:0];
+reg           nvs_byte_en [UV_NVS_MAX_DATA_ARR_SIZE-1:0];
+reg           dis_make_pkt;
+reg           dis_byte_en_pkt;
+reg user_data;
+//vcs_vip_protect 
+`protected
+:72T#:FAX5:59Y>=#@P<TE]9J2Q-5TQT3O:?ID>Ac-^g1QK/N>H@7(L^0_dFf1@;
+d#_?1g.\BLXYM[S(CRXg6gb1bIG>Vgd]]?S1>0ZRNQ=H-H26Q2;=_4X;NN>UL4V]
+_6#@BZGNe>7.[RX15@LISL5.dPS.<B#Y:+(5]4LOWA<?7K.69..._9(=8J@^:E;?
+FHJ=9SURUeLPJI>G-&>NP.J^?<ZeF(aCbCQ]TW=[dE3ded=&:/R>/=S\MKA/F+f\
++3D]eN._D4D0.IOY_/C9+QK2J>c:eWd[FUMYbc(T>J#^8CA??B)(=>\ccD_WNAIO
+0e91QXU4,RG6+G^dC:XP;<,+[dBg,EJWCUcO_cPd-;6MPW#BWc3N9N1(f1K5O]:/
+ZPIb\\F3Qb,W7J>/<bNeK=KI)IEfW3)12^WDEQ_K/4)90ScI@aIHE1DM(F38(N^_
+eP09beU^./8CIRC1aDDa2gWJC80K0.5dWOCg;D]3/+B/FI52JG37a2\CV36dfB41
+/]3>JT<8J[>QBYZ:Y8Y#5/PQ6c);-;MS?WVH=)]=PN=:?K,PM4Y\/f@Q^Oe.,_0#
+DNdH+V[=T-#5#WJM<G<Hg#UWANE,GL1W(NW=U;^#/P\>6DX.L##IR91MJRLD?^b4
+MZLOG>e:TOW01,=aNVKC?6\&<H+R:M[A(a4^#&-4:L6,O>@\I108WD]bd3-/QU(,
+X^F<7W^.C<4L\>\WJEcgM?&29JGO;SD.M-T.5@G1c9B_ADVgZBRZ0Y>5GX76LF7Z
+Q\-\=;(31A8]_RN8N>^AOK1bY+D)L4.^[78MTDbC8#WY<)V=7AD[?B4ICcWTHRffW$
+`endprotected
+   
+   //--------------------------------------------------------------------
+   // Task do_pkt
+   // This task is used to put user specified data in the packet being 
+   // transmitted. In this task mode_pkt_sz parameter set by do_cfg task.
+   // This task provides options for to set data. Various values of 
+   // mode_pkt_sz are 
+   // 1. UV_NVS_BYTE  : Accept data in byte format
+   // 2. UV_NVS_WORD  : Accept data in word format (2-bytes at a time)
+   // 3. UV_NVS_DWORD : Accept data in dword format (4-bytes at a time)
+   // 4. UV_NVS_QWORD : Accept data in qword format (8-bytes at a time)
+   //
+   // Whenever this task is called global variable dis_make_pkt is
+   // asserted. This helps the user to identify do_pkt call.
+   // User of this task can reset this variable to identify further
+   // do_pkt calls.
+   //--------------------------------------------------------------------
+   task do_pkt;
+      input [31:0] index;
+      input [63:0] data ;
+      integer  count;
+      reg [11:0] range;
+      integer      i    ;
+      integer seed;
+      begin:BLK_DO_PKT
+//vcs_vip_protect 
+`protected
+7L4KG8DT2QW]7I72:b<cbV(+U.>^;OaA^DW=ab#VI59TE_T^EI2(-(AI=S:\1Og\
+Mb^+?Y\/S0,Y?U2d7fX#<WH9T[,C)D4XA40LFH9\<<V8e,+W-F4\;e>^B^c7NdT/
+QKX7VY+,+NbABUb@JXMON<LW+2K@RW5BV?_Y5J1K[58Rd[\1C]6NI\\d9594#g((
+\,=dQS?Q1>E4:G&eOPUe#^\Q<_f?>I@HdK^IOB/.J/0Q]9UC2cYg9eXM430cgF5O
+d8VI9a0b1T#TDE(H@#Ke_-3,c[UfY0A_.D#V^E9H^bDT&_&Q\YUV@7_NOKHR3;D^
+#1ZfN#Z[=DG)9gMB(78fVbVA\bf-.2JV[#1?I,6XV2_OV,E<#8&8JW8,6@YYMcB.
+FM;N3/?IG;f-DT^U4WKWfgXb#>:PbMb6Y[19A(d7<VYC4,CYK8P9].g3?:]?UK+)
+9T>0V8JF9W&c\98/>gR4c)P)KRN6C:bMW_QaT;LK;XOH=a4GD>,Cg+POD^d-CBK]
+9cP<7b4IU0A<Q]><eE\XNH[+,(U:NSJ7U?4,GF[E><6U\IC0TNYJNeCg\4/<N:B7
+59PC)KR/,27^_dV0)C3O3bQ@CDIaTYYLNb^:1=(@eHNf<_cBL>L=O4DXa;Ng&4\P
+XHN/467WL[<>KAB]I2,6TYF/V&^YWXOEZ#LWdA5eC;-KafN8N,.XeL1g@]eK?;<;
+eZA@UgCfDJ=YHAB4FU1XDE.5J@2&/Q\5>WMZEE5)E@g#gfL5MCH#a]c_9(FFZQ15
+dJARFH>U1\1V,A8^NBB(6#FMeO]A&?V.SSCW\4e#HV\]NMX<SFD(836N.Wg>@/;>
+PGG,@;I]^AW_I?)<Z4I6&Bf4CPU?8_K&):6B2\&@#IBWGKVD<16E=2DKVHg:cA>]
+;6)_.D^J3SV88Z@;M=JCAW5FAB/I0Qd94M/1DeM>@H7P,J#aHCJ)K6OZf5[Y\?1e
+C7A;=7;9>bQT.]:TLd+f/^([0>^<-]gS3^U9Q5<[&Fc],SW-,?#X+bOS2^gMUHOH
+>:]&F8;5@FXf-[U3O8ICD-C^=eef_1G753C;fQ/&?XJR[cV1G5.Hf2QUf0AU&IEd
+[98WXRd7^.:^G#,Sa67C_4[)(UWfXd<F8<9T;P+,/^Y@+8O@)C6<XRMC1gN97V._
+bfKJ/F\TQ<KA(=0PSQ[J#L]AgA\-8;76;0ZZ#1Vf9-eLB-?2]3^,/a]0M3gL6>D=
+RR/-CdG7JHfC]@b;SgCLI@2F2JCVZ/UI>K#<C::TKOX7TP#ZC_<#_2]0]F\f]d9J
+:LZSG+\#M&8=20XW6_>(^S+YTYdUE\2WPH6TZ/U;/5eVE=SZV[ZN[0f#E&F6edgH
+O/NL?<?=cMO-.@6NcgS2fKH#1W^=B9\FNYJL#JJ6e]f))0VS]JP-D1^-T^UKLLD@
+#(LX3Z75>F2M^(DD]](71XW(38\>5I^8>0(/5V_FZ:?^YCWY?_3O5O=?50_#SN,O
+]GddS.Y5586B56c1^L=5b=0@P0Y19=e@6@<H/IK<V@7?/8YTF/AEC2:CS-g2:@&X
+NG0E4/8#HXSY^JEG[D9FgNg-;_/.[d4<#(W/0]9;d#W#S6G@@[VHc^:CP$
+`endprotected
+
+      end // block: BLK_DO_PKT
+   endtask // do_pkt
+   
+   //----------------------------------------------------------------------
+   // Task Name   : do_byte_en
+   // Inputs      :
+   // 1. Index    : The index value to store write strobe
+   // 2. byte_en  : Input write strobe   
+   // Description : This task  is used to make byte en packet  
+   //               that is entered by the user.
+   // Various modes used depends on mode_byte_en_pkt_sz,values are:
+   // 1. UV_NVS_BYTE  : Byte enable for one   byte  is used
+   // 2. UV_NVS_WORD  : Byte enable for two   bytes is used
+   // 3. UV_NVS_DWORD : Byte enable for four  bytes is used
+   // 4. UV_NVS_QWORD : Byte enable for eight bytes is used
+   // 
+   // It asserts dis_byte_en_pkt whenever do_byte_en task is used. Which 
+   // helps user to identify do_byte_en task calls.
+   // User can subsequently reset this global variable to identify further 
+   // do_byte_en task calls.
+   //----------------------------------------------------------------------
+   task do_byte_en;
+      input [31:0] index;
+      input [7:0] byte_en;
+      reg   [11:0] range;
+      integer i;
+      integer seed;
+      begin:BLK_DO_BYTE_EN
+//vcs_vip_protect 
+`protected
+K7PXAYRFOaSYR5&Q@b7b^2>PWP&H6aI#LA52W5[1U)[B5WJG3f,O+(f+YO#:&I+P
+e^dV]R3g17D:c:9M37+L;1Y.TTJDG],ZRYJC9a.2<7BGX^g?4+J_g#[g0H9JYd3W
+RM[MUDVfMOAJ,INS^daMX85\;/\<YT@;4->Q,179d\&HT]aa.?JUJ03>>A-GO(Ue
+PHTdU6B33O^J(;1TH_=MJe=4B2T;8@1YeQa_9MY9[:?,4)E2eYb2;Y4YG/[WB8T3
+SDQ9OHH1A]YICaS314e77\8<23\V3]+]OSb0.RRf,GE8I=\#Q=Lf1Y\K)d??VV_;
+,H:4/3DD7VYXgXGc^]c/8:MZUHdMIMN;5YN>.fS_QQKI_23BE[\@K;aT+dTHZ4H0
+8QFCBYE::a68SAdL0[#;&/WD90H(KGaW-(^5a<=H]_/Od_><ZNQ0OVGB0gLHZT\=
+PR;OSB5Re2g)0db5^5B3Z2ZRMWDA7UNFHa7U+5]IEc:PaZJ7(BNT)_8AeX(QQS&G
+1X>eU_@S^_W@5_>+Z)T,^4QZH+b6a)KcI\KC&[[<X48-K>C^P=FK_^GY6&64ASRI
+eS>+RTc)7b/N.C@\#-^B4BVY/95R][W-;9C)E@U.bWb0#-I)2;4OdSa/M&N5Q\X/
+0e?:/=IdD_.J?a4Qgd9ReQZSOFIS(dCV/.<)#-gJ5\-S0D([_4N\P[de6Q-eULf8
+5TUZXE=JIeXfB;YSbC4dC2W7+fX]T=]O0A3/YP,>4LM._NOW5,>[13?Q4<_)9gA+
+#0#d:CDd]5SZ.+C2.2DMXM/c2:(X21:O<MBA\+QP0B26/I@0:IKYF\/BYS0d]<df
+Ab_A3-aS)(d-/X<3;Re<W?gK&93MMOcV9U(Sc^:?),F45(+aE8c;[Lf82BBG,7K\T$
+`endprotected
+
+      end // block: BLK_DO_BYTE_EN
+   endtask // do_byte_en
+   
+
+
+//*************************************END OF FILE*******************************************
+

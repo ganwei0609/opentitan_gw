@@ -71,7 +71,7 @@ class uart_scoreboard extends cip_base_scoreboard #(.CFG_T(uart_env_cfg),
     forever begin
       uart_tx_fifo.get(act_item);
 
-      `uvm_info(`gfn, $sformatf("received uart tx item:\n%0s", act_item.sprint()), UVM_HIGH)
+      `uvm_info(`gfn, $sformatf("received uart tx item: data:%d, parity:%d", act_item.data, act_item.parity), UVM_HIGH)
       `DV_CHECK_EQ(tx_processing_item_q.size(), 1)
       exp_item = tx_processing_item_q.pop_front();
       // move item from fifo to process

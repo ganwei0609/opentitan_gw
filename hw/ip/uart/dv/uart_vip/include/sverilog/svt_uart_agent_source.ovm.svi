@@ -1,0 +1,14 @@
+
+`ifndef GUARD_SVT_UART_AGENT_SOURCE_OVM_SVI
+`define GUARD_SVT_UART_AGENT_SOURCE_OVM_SVI
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_agent_configuration)
+
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx_source.ovm)
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_source.ovm)
+
+
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_agent_svt,O-2018.09,svt_uart_agent)
+
+`endif // GUARD_SVT_UART_AGENT_SOURCE_OVM_SVI
+

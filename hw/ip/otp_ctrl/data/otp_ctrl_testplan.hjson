@@ -83,12 +83,11 @@
     {
       name: interface_key_check
       desc: '''
-            OTP_CTRL will generate keys to flash, sram, and OTBN upon their requests.
-            This test will randomly issue key requests from the above modules either before or
-            after partitions are locked, and check if generated keys are correct.
+            OTP_CTRL can output keys to key_manager, flash, sram, and OTBN. This test will modify
+            inputs and OTP storage, the check if generated keys are correct.
             '''
       milestone: V2
-      tests: ["otp_ctrl_rand_key_rsp"]
+      tests: []
     }
     {
       name: lc_interactions
@@ -105,32 +104,20 @@
       milestone: V2
       tests: ["otp_ctrl_lc"]
     }
-    { name: otp_dai_errors
-      desc: '''
-            This test will randomly run the following OTP errors:
-            - DAI interface write non-blank OTP address
-            - DAI interface access LC partition
-            - DAI interface write HW digests
-
-            The test will check:
-            - The value of err_code and status registers
-            '''
-      milestone: V2
-      tests: ["otp_ctrl_dai_errs"]
-    }
     { name: otp_macro_errors
       desc: '''
             This test will randomly run the following OTP errors:
             - MacroError
             - MacroEccCorrError
             - MacroEccUncorrError
+            - MacroWriteBlankError
 
             The test will check:
             - The value of err_code and status registers
             - If error is unrecoverable, ensure that OTP entered terminal state
             '''
       milestone: V2
-      tests: []
+      tests: ["otp_ctrl_macro_errs"]
     }
     {
       name: otp_ctrl_errors

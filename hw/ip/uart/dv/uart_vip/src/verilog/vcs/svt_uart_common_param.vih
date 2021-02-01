@@ -1,0 +1,45 @@
+//----------------------------------------------------------------------
+// Parameters
+//----------------------------------------------------------------------
+parameter	UV_BAUD_RATE                    = `UV_BAUDRATE_38400;
+parameter	UV_CRYSTAL_FREQUENCY            = 1843200;
+parameter	UV_PARITY                       = `UV_EVEN;
+parameter	UV_STOP_BITS                    = `UV_TWO_STOP_BIT; // Need 1
+parameter       UV_DATA_SIZE                    = 9;
+parameter       UV_START_BITS                   = `UV_START_BIT_SIZE;
+parameter       UV_PARITY_BITS                  = 1;
+parameter       UV_PKT_LENGTH_SIZE              =  UV_START_BITS + UV_STOP_BITS 
+                                                   + UV_DATA_SIZE + UV_PARITY_BITS;   
+parameter	UV_WAIT_FOR_DSR 		= 1000000;
+parameter	UV_MAX_WAIT_FOR_START_AFTER_DTR = 1000000;
+parameter       UV_IN_BAND_PATT_OFF             = 9'b0000_0110_1;
+parameter       UV_IN_BAND_PATT_ON              = 9'b0000_0101_1;
+parameter       UV_MODE_IN_OUT_BOUND            = `UV_OUT_OF_BAND; //or `UV_IN_BAND
+parameter       UV_RX_BUFF_SIZE	                = 10;
+parameter       UV_CTS_ASSERT_TIME_DELAY        = 200;
+parameter       UV_RTS_ASSERT_TIME_DELAY        = 200;
+parameter       UV_DELAY_TO_FLUSH_BUFFER        = 100;
+parameter       UV_MAX_DELAY_TO_XON_AFTER_XOFF  = 1000; //keep this greater than the UV_DELAY_TO_FLUSH_BUFFER
+parameter       SVT_UART_DEVICE_TYPE            = `UV_DTE;
+parameter       UV_DEVICE_TYPE                  = SVT_UART_DEVICE_TYPE;
+
+parameter       UV_DISABLE_RTS_CTS_HANDSHAKE    = 1'b0;
+parameter       UV_DISABLE_DTR_DSR_HANDSHAKE    = 1'b0;
+parameter       UV_DTE_WAIT_FOR_XON_AFTR_POWER_UP = 1'b0;
+//---------------------------------------------------------------------
+// By default only TX or RX handshaking is enable, setting this parameter
+// to 1'b1 would enable the both TX and RX handshaking.
+parameter       UV_ENABLE_TX_RX_HANDSHAKE   = 1'b0;
+
+
+//vcs_vip_protect 
+`protected
+[39_9OTE#G1[MFE+GDE[P-.,Z_\9D5&a\THVeaRXR5S53B]/<Zg_-(#5TN<S4A@X
+TBG[=F1,8A]BD4-C-e\OAceCT4+-WNg+PU9OH/cU?47=[64Pb;MUQbFVbf1]QMS8
+@CPfJd^bbW;)D?5Tg&PfQP9R4S^WL][gD6GB?[e/7&+=C$
+`endprotected
+
+
+
+//*************************************END OF FILE*******************************************
+

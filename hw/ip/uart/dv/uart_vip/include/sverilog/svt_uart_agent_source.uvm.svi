@@ -1,0 +1,24 @@
+
+`ifndef GUARD_SVT_UART_AGENT_SOURCE_UVM_SVI
+`define GUARD_SVT_UART_AGENT_SOURCE_UVM_SVI
+
+`include `SVT_SOURCE_MAP_SUITE_MODULE(uart_svt,O-2018.09,svt_uart_agent_configuration)
+
+`ifdef UART_ZEBUMODE
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx_source.uvm)
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_source.uvm)
+`else
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_txrx_svt,O-2018.09,svt_uart_txrx_source.uvm)
+`include `SVT_SOURCE_MAP_MODEL_INCLUDE_SVI(uart_svt,uart_monitor_svt,O-2018.09,svt_uart_monitor_source.uvm)
+`endif
+
+
+`include `SVT_SOURCE_MAP_MODEL_MODULE(uart_svt,uart_agent_svt,O-2018.09,svt_uart_agent)
+
+
+`endif // GUARD_SVT_UART_AGENT_SOURCE_UVM_SVI
+
+
+//----------------------------------------------------------------------------
+//--------------------------END OF FILE---------------------------------------
+//----------------------------------------------------------------------------

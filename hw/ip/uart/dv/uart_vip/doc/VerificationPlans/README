@@ -1,0 +1,78 @@
+
+
+************************************************************************************
+High level verification plans for the  UART Verification IP
+************************************************************************************
+
+CONTENTS:
+A. Top level plans
+B. Sub-plans
+C. Back annotation with VMM Planner
+
+Plans listed in this document are available in the directory $DESIGNWARE_HOME/vip/svt/uart_svt/latest/doc/VerificationPlans
+
+--------------------------------------------------------------------------
+A. Top level plans
+--------------------------------------------------------------------------
+
+Table below provides the details of Top level plans.
+
+---------------------------------------------------------------------------------
+|  DUT operation | VIP operation  |                Top level plan               |
+---------------------------------------------------------------------------------
+|       DTE      |       DCE      |   svt_uart_dce_dut_top_level_plan.xml       |
+---------------------------------------------------------------------------------
+|       DCE      |       DTE      |   svt_uart_dte_dut_top_level_plan.xml       |
+---------------------------------------------------------------------------------
+|   Interconnect |    DTE & DCE   |   svt_uart_interconnect_top_level_plan.xml  |
+---------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+B. Sub-plans
+--------------------------------------------------------------------------
+
+The below table provides the names of sub-plans available and relevant information on the sub-plans.
+
+---------------------------------------------------------------------------------
+|               sub-plan                      | VIP operation  |   Technology   |
+---------------------------------------------------------------------------------
+| svt_uart_dte_transaction_sub_plan.xml       |       DTE      |    UVM/OVM     |  
+---------------------------------------------------------------------------------
+| svt_uart_dte_toggle_sub_plan.xml            |       DTE      |    UVM/OVM     |
+---------------------------------------------------------------------------------
+| svt_uart_dte_pattern_sub_plan.xml           |       DTE      |    UVM/OVM     |
+---------------------------------------------------------------------------------
+| svt_uart_dce_transaction_sub_plan.xml       |       DCE      |    UVM/OVM     |
+---------------------------------------------------------------------------------
+| svt_uart_dce_toggle_sub_plan.xml            |       DCE      |    UVM/OVM     |
+---------------------------------------------------------------------------------
+| svt_uart_dce_pattern_sub_plan.xml           |       DCE      |    UVM/OVM     |
+---------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+C. Back annotation with VMM Planner
+--------------------------------------------------------------------------
+
+All the Verification Plans listed in above sections are available in the directory $DESIGNWARE_HOME/vip/svt/uart_svt/latest/doc/VerificationPlans
+
+The command to do the backannotation of the verification plans is:
+hvp annotate -dir <your_simv>.vdb -plan $DESIGNWARE_HOME/vip/svt/uart_svt/latest/doc/VerificationPlans/svt_uart_interconnect_top_level_plan.xml 
+
+The above command as two inputs 
+  -- <your_simv>.vdb (vdb file)
+  -- .xml file, a top level functional verification plan (one of VIP provided plans)
+
+The above command has one output
+  -- <my_annotated_plan_name>.xml
+
+--------------------------------------------------------------------------
+D. Back annotation with Verdi
+--------------------------------------------------------------------------
+The following are steps to load .hvp file and coverage in Verdi
+1.	Launch Verdi: % verdi -cov &
+2.	Open the .hvp file: Plan -> open plan. Choose one of the top .hvp files.
+3.	Open coverage database (.vdb): File -> Open/Add Database
+4.	Use predefined layout: Window -> Plan Mode or Coverage + Plan Mode
+5.	Back Annotate: In the “Hvp” window, click on the recalculate button.  
+6.	Now you should see the back annotated plan in the “Hvp” window. Expand the
+    levels if needed.

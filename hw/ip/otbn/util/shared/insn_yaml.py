@@ -27,7 +27,7 @@ class Insn:
                         ['mnemonic', 'operands'],
                         ['group', 'rv32i', 'synopsis',
                          'syntax', 'doc', 'note', 'trailing-doc',
-                         'operation', 'encoding', 'glued-ops',
+                         'decode', 'operation', 'encoding', 'glued-ops',
                          'literal-pseudo-op', 'python-pseudo-op', 'lsu',
                          'straight-line', 'cycles'])
 
@@ -53,19 +53,6 @@ class Insn:
                                           self.operands,
                                           lambda op: op.name)
 
-        # The call to index_list has checked that operand names are distinct.
-        # We also need to check that no operand abbreviation clashes with
-        # anything else.
-        operand_names = set(self.name_to_operand.keys())
-        for op in self.operands:
-            if op.abbrev is not None:
-                if op.abbrev in operand_names:
-                    raise ValueError('The name {!r} appears as an operand or '
-                                     'abbreviation more than once for '
-                                     'instruction {!r}.'
-                                     .format(op.abbrev, self.mnemonic))
-                operand_names.add(op.abbrev)
-
         if self.encoding is not None:
             # If we have an encoding, we passed it to the Operand constructors
             # above. This ensured that each operand has a field. However, it's
@@ -86,6 +73,7 @@ class Insn:
         self.doc = get_optional_str(yd, 'doc', what)
         self.note = get_optional_str(yd, 'note', what)
         self.trailing_doc = get_optional_str(yd, 'trailing-doc', what)
+        self.decode = get_optional_str(yd, 'decode', what)
         self.operation = get_optional_str(yd, 'operation', what)
 
         raw_syntax = get_optional_str(yd, 'syntax', what)
@@ -185,29 +173,21 @@ class Insn:
 
     def disassemble(self,
                     cur_pc: int,
-                    op_vals: Dict[str, int]) -> str:
+                    op_vals: Dict[str, int],
+                    mnem_width: int) -> str:
         '''Return disassembly for this instruction
 
         op_vals should be a dictionary mapping operand names to operand values
         (not encoded values). mnem_width is the width to pad the mnemonic to.
 
         '''
-        hunks = self.syntax.render(cur_pc, op_vals, self.name_to_operand)
-        mnem = self.mnemonic
-        if hunks and self.glued_ops:
-            mnem += hunks[0] + ' '
-            hunks = hunks[1:]
-        else:
-            mnem += ' '
+        padded_mnem = self.mnemonic
+        if len(padded_mnem) < mnem_width:
+            padded_mnem += ' ' * (mnem_width - len(padded_mnem))
 
-        if len(mnem) < 15:
-            mnem += ' ' * (15 - len(mnem))
-
-        # The lstrip here deals with a tricky corner case for instructions like
-        # bn.mulqacc if the .z option isn't supplied. In that case, the syntax
-        # for the operands starts with a space (following the optional .z that
-        # isn't there) and would mess up our alignment.
-        return mnem + ''.join(hunks).lstrip()
+        return (padded_mnem +
+                ('' if self.glued_ops else ' ') +
+                self.syntax.render(cur_pc, op_vals, self.name_to_operand))
 
 
 def find_ambiguous_encodings(insns: List[Insn]) -> List[Tuple[str, str, int]]:

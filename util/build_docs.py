@@ -38,8 +38,8 @@ USAGE = """
 
 # Version of hugo extended to be used to build the docs
 try:
-    TOOL_REQUIREMENTS = check_tool_requirements.read_tool_requirements()
-    HUGO_EXTENDED_VERSION = TOOL_REQUIREMENTS['hugo_extended'].min_version
+    tool_requirements = check_tool_requirements.read_tool_requirements()
+    HUGO_EXTENDED_VERSION = tool_requirements['hugo_extended']
 except Exception as e:
     print("Unable to get required hugo version: %s" % str(e), file=sys.stderr)
     sys.exit(1)
@@ -201,38 +201,34 @@ def generate_selfdocs():
                 fout.write(tlgen.selfdoc(heading=3, cmd='tlgen.py --doc'))
 
 
-def generate_pkg_reqs():
-    """Generate an apt/yum command line invocation from
-    apt/yum-requirements.txt
+def generate_apt_reqs():
+    """Generate an apt-get command line invocation from apt-requirements.txt
 
-    This will be saved in outdir-generated/apt_cmd.txt and
-    outdir-generated/yum_cmd.txt, respectively.
+    This will be saved in outdir-generated/apt_cmd.txt
     """
+    # Read the apt-requirements.txt
+    apt_requirements = []
+    requirements_file = open(str(SRCTREE_TOP.joinpath("apt-requirements.txt")))
+    for package_line in requirements_file.readlines():
+        # Ignore everything after `#` on each line, and strip whitespace
+        package = package_line.split('#', 1)[0].strip()
+        if package:
+            # only add non-empty lines to packages
+            apt_requirements.append(package)
 
-    for pkgmgr in ["apt", "yum"]:
-        # Read the apt/yum-requirements.txt
-        requirements = []
-        requirements_file = open(str(SRCTREE_TOP.joinpath(pkgmgr + "-requirements.txt")))
-        for package_line in requirements_file.readlines():
-            # Ignore everything after `#` on each line, and strip whitespace
-            package = package_line.split('#', 1)[0].strip()
-            if package:
-                # only add non-empty lines to packages
-                requirements.append(package)
-
-        cmd = "$ sudo " + pkgmgr + " install " + " ".join(requirements)
-        cmd_lines = textwrap.wrap(cmd,
+    apt_cmd = "$ sudo apt-get install " + " ".join(apt_requirements)
+    apt_cmd_lines = textwrap.wrap(apt_cmd,
                                   width=78,
                                   replace_whitespace=True,
                                   subsequent_indent='    ')
-        # Newlines need to be escaped
-        cmd = " \\\n".join(cmd_lines)
+    # Newlines need to be escaped
+    apt_cmd = " \\\n".join(apt_cmd_lines)
 
-        # And then to write the generated string directly to the file.
-        cmd_path = config["outdir-generated"].joinpath(pkgmgr + '_cmd.txt')
-        cmd_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(str(cmd_path), mode='w') as fout:
-            fout.write(cmd)
+    # And then to write the generated string directly to the file.
+    apt_cmd_path = config["outdir-generated"].joinpath('apt_cmd.txt')
+    apt_cmd_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(str(apt_cmd_path), mode='w') as fout:
+        fout.write(apt_cmd)
 
 
 def generate_tool_versions():
@@ -241,12 +237,16 @@ def generate_tool_versions():
     The version number per tool will be saved in outdir-generated/version_$TOOL_NAME.txt
     """
 
+    # Populate __TOOL_REQUIREMENTS__
+    requirements_file = str(SRCTREE_TOP.joinpath("tool_requirements.py"))
+    exec(open(requirements_file).read(), globals())
+
     # And then write a version file for every tool.
-    for tool, req in TOOL_REQUIREMENTS.items():
+    for tool in __TOOL_REQUIREMENTS__:  # noqa: F821
         version_path = config["outdir-generated"].joinpath('version_' + tool + '.txt')
         version_path.parent.mkdir(parents=True, exist_ok=True)
         with open(str(version_path), mode='w') as fout:
-            fout.write(req.min_version)
+            fout.write(__TOOL_REQUIREMENTS__[tool])  # noqa: F821
 
 
 def generate_dif_docs():
@@ -446,7 +446,7 @@ def main():
     generate_dashboards()
     generate_testplans()
     generate_selfdocs()
-    generate_pkg_reqs()
+    generate_apt_reqs()
     generate_tool_versions()
     generate_dif_docs()
     generate_otbn_isa()

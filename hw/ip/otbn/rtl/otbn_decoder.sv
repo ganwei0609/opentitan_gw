@@ -49,9 +49,6 @@ module otbn_decoder
   assign insn     = insn_fetch_resp_data_i;
   assign insn_alu = insn_fetch_resp_data_i;
 
-  logic unused_insn_alu_bits;
-  assign unused_insn_alu_bits = (|insn_alu[11:7]) | (|insn_alu[24:15]);
-
   //////////////////////////////////////
   // Register and immediate selection //
   //////////////////////////////////////
@@ -801,6 +798,7 @@ module otbn_decoder
         alu_op_a_mux_sel_base = OpASelRegister;
         imm_b_mux_sel_base    = ImmBaseBI;
       end
+      default: ;
 
       ////////////////
       // Bignum ALU //
@@ -925,8 +923,6 @@ module otbn_decoder
           mac_flag_en_bignum = 1'b1;
         end
       end
-
-      default: ;
     endcase
 
   end

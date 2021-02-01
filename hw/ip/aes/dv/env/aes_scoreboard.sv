@@ -152,11 +152,9 @@ class aes_scoreboard extends cip_base_scoreboard #(
         if (get_field_val(ral.trigger.start, item.a_data)) begin
           ok_to_fwd                = 1;
         end
-        // clear key, IV, data_in
-        if (get_field_val(ral.trigger.key_iv_data_in_clear, item.a_data)) begin
+        // clear key
+        if (get_field_val(ral.trigger.key_clear, item.a_data)) begin
           void'(input_item.key_clean(0, 1));
-          void'(input_item.iv_clean(0, 1));
-          input_item.clean_data_in();
           // if in the middle of a message
           // this is seen as the beginning of a new message
           if (!input_item.start_item) begin
@@ -164,7 +162,21 @@ class aes_scoreboard extends cip_base_scoreboard #(
             `uvm_info(`gfn, $sformatf("splitting message"), UVM_MEDIUM)
           end
           `uvm_info(`gfn, $sformatf("\n\t ----clearing KEY"), UVM_MEDIUM)
+        end
+        // clear IV
+        if (get_field_val(ral.trigger.iv_clear, item.a_data)) begin
+          void'(input_item.iv_clean(0, 1));
+          // if in the middle of a message
+          // this is seen as the beginning of a new message
+          if (!input_item.start_item) begin
+            input_item.start_item = 1;
+            `uvm_info(`gfn, $sformatf("splitting message"), UVM_MEDIUM)
+          end
           `uvm_info(`gfn, $sformatf("\n\t ----| clearing IV"), UVM_MEDIUM)
+        end
+        // clear data_in
+        if (get_field_val(ral.trigger.data_in_clear, item.a_data)) begin
+          input_item.clean_data_in();
           `uvm_info(`gfn, $sformatf("\n\t ----| clearing DATA_IN"), UVM_MEDIUM)
         end
         // clear data out
@@ -356,8 +368,7 @@ class aes_scoreboard extends cip_base_scoreboard #(
           // and no output is ready
           // there won't be a response for this item
           // reset/clear was triggered
-          if (get_field_val(ral.status.idle, item.d_data) &&
-              get_field_val(ral.status.output_lost, item.d_data)) begin
+          if (item.d_data[3:0] == 4'b1001) begin
             if (rcv_item_q.size() != 0) begin
               void'(rcv_item_q.pop_back());
               `uvm_info(`gfn, $sformatf("\n\t ----| removing item from input queue"), UVM_MEDIUM)
@@ -581,11 +592,10 @@ class aes_scoreboard extends cip_base_scoreboard #(
 
     super.report_phase(phase);
     txt = $sformatf("\n\t ----|        TEST FINISHED        |----");
-    txt = { txt, $sformatf("\n\t Saw %d Good messages  ", good_cnt)};
-    txt = { txt, $sformatf("\n\t Skipped %d messages  " , skipped_cnt)};
-    txt = { txt, $sformatf("\n\t Split %d messages  "   , cfg.split_cnt)};
-    txt = { txt, $sformatf("\n\t Expected %d messages  ", cfg.num_messages)};
-    txt = { txt, $sformatf("\n\t Expected %d corrupted ", cfg.num_corrupt_messages)};
+    txt = {   txt, $sformatf("\n\t Saw %d Good messages ", good_cnt)};
+    txt = {   txt, $sformatf("\n\t Skipped %d messages " , skipped_cnt)};
+    txt = {   txt, $sformatf("\n\t Split %d messages "   , cfg.split_cnt)};
+    txt = {   txt, $sformatf("\n\t Expected %d messages ", cfg.num_messages)};
     rpt_srvr = uvm_report_server::get_server();
     if (rpt_srvr.get_severity_count(UVM_FATAL)+rpt_srvr.get_severity_count(UVM_ERROR)>0) begin
       `uvm_info(`gfn, $sformatf("%s", cfg.convert2string()), UVM_LOW)

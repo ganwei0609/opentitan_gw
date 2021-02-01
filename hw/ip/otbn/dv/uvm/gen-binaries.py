@@ -118,7 +118,6 @@ def main() -> int:
                               'if set, or build-out at the top of the '
                               'repository if not.'))
     parser.add_argument('--seed', type=read_positive, default=0)
-    parser.add_argument('--size', type=read_positive, default=100)
     parser.add_argument('--verbose', '-v', action='store_true')
     parser.add_argument('--jobs', '-j', type=read_jobs, nargs='?',
                         const='unlimited', help='Number of parallel jobs.')
@@ -141,8 +140,7 @@ def main() -> int:
     os.makedirs(args.destdir, exist_ok=True)
 
     with open(os.path.join(args.destdir, 'build.ninja'), 'w') as ninja_handle:
-        write_ninja(ninja_handle, rig_count,
-                    args.seed, args.size, toolchain, otbn_dir)
+        write_ninja(ninja_handle, rig_count, args.seed, toolchain, otbn_dir)
 
     # Handle the -j argument like Make does, defaulting to 1 thread. This
     # behaves a bit more reasonably than ninja's default (# cores) if we're
@@ -161,7 +159,7 @@ def main() -> int:
     return subprocess.run(cmd, cwd=args.destdir, check=False).returncode
 
 
-def write_ninja(handle: TextIO, rig_count: int, start_seed: int, size: int,
+def write_ninja(handle: TextIO, rig_count: int, start_seed: int,
                 toolchain: Toolchain, otbn_dir: str) -> None:
     '''Write a build.ninja to build rig_count random binaries and a smoke test
 
@@ -169,17 +167,14 @@ def write_ninja(handle: TextIO, rig_count: int, start_seed: int, size: int,
     OTBN tooling is found in util_dir.
 
     '''
-    assert start_seed >= 0
-    assert size > 0
-
-    otbn_rig = os.path.join(otbn_dir, 'dv/rig/otbn-rig')
+    otbn_rig = os.path.join(otbn_dir, 'util/otbn-rig')
     smoke_src_dir = os.path.join(otbn_dir, 'dv/smoke')
 
     seeds = [start_seed + idx for idx in range(rig_count)]
 
     handle.write('rule rig-gen\n'
-                 '  command = {rig} gen --size {size} --seed $seed >$out\n'
-                 .format(rig=otbn_rig, size=size))
+                 '  command = {rig} gen --size 100 --seed $seed -o $out\n'
+                 .format(rig=otbn_rig))
 
     handle.write('rule rig-asm\n'
                  '  command = {rig} asm -o $seed $in\n'

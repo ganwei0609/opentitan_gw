@@ -10,6 +10,7 @@
                "-timescale=1ns/1ps",
                "-Mdir={build_ex}.csrc",
                "-o {build_ex}",
+			   "-f /home/share/pro/OpenTitan/opentitan_gw/hw/ip/uart/dv/synopsys_uart_vip.f",
                "-f {sv_flist}",
                // List multiple tops for the simulation. Prepend each top level with `-top`.
                "{eval_cmd} echo {sim_tops} | sed -E 's/(\\S+)/-top \\1/g'",

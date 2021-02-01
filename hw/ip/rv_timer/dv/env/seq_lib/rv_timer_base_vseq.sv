@@ -23,10 +23,8 @@ class rv_timer_base_vseq extends cip_base_vseq #(
   }
 
   // hart specific parameters
-  // These need to be NUM_HARTS size arrays; but the current assumption is these values will be the
-  // same for all harts.
-  bit [TL_DW-1:0] max_prescale;
-  bit [TL_DW-1:0] max_step;
+  bit [TL_DW-1:0]   max_prescale;
+  bit [TL_DW-1:0]   max_step;
 
   `uvm_object_new
 

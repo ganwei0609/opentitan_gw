@@ -40,6 +40,7 @@ class uart_monitor extends dv_base_monitor#(
 
   virtual task collect_tx_data();
     uart_item item;
+	cfg.print();
     forever begin
       if (cfg.vif.uart_tx === 1'b0 && cfg.en_tx_monitor == 1) begin
         // 1 start + 8 data + 1 parity (if enabled) + 1 stop

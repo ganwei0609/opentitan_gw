@@ -65,15 +65,16 @@ module tb;
     // Idle interface
     .idle_o               (idle                     ),
 
-    // EDN interface
+    // TODO: hook up interfaces for:
+    //
+    // 1) KDF
+    // 2) csrng/edn
+
+    // edn
     .clk_edn_i                  (edn_clk    ),
     .rst_edn_ni                 (edn_rst_n  ),
     .entropy_o                  (edn_if.req ),
     .entropy_i                  ({edn_if.ack, edn_if.d_data})
-
-    // TODO: hook up interfaces for:
-    //
-    // 1) KDF
   );
 
   // Interface assignments

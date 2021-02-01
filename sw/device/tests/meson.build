@@ -16,7 +16,6 @@ sw_tests = {
 subdir('dif')
 subdir('rom_ext')
 subdir('runtime')
-subdir('sca')
 subdir('sim_dv')
 subdir('otbn')
 

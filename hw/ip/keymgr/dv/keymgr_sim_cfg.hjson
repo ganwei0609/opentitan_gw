@@ -33,7 +33,8 @@
                 "{proj_root}/hw/dv/tools/dvsim/tests/intr_test.hjson",
                 "{proj_root}/hw/dv/tools/dvsim/tests/alert_test.hjson",
                 "{proj_root}/hw/dv/tools/dvsim/tests/tl_access_tests.hjson",
-                "{proj_root}/hw/dv/tools/dvsim/tests/stress_tests.hjson"
+                // TODO, enable it later
+                // "{proj_root}/hw/dv/tools/dvsim/tests/stress_tests.hjson"
                 ]
 
   // Add additional tops for simulation.
@@ -81,18 +82,8 @@
     }
 
     {
-      name: keymgr_sw_invalid_input
-      uvm_test_seq: keymgr_sw_invalid_input_vseq
-    }
-
-    {
-      name: keymgr_hwsw_invalid_input
-      uvm_test_seq: keymgr_hwsw_invalid_input_vseq
-    }
-
-    {
-      name: keymgr_stress_all
-      uvm_test_seq: keymgr_stress_all_vseq
+      name: keymgr_invalid_kmac_input
+      uvm_test_seq: keymgr_invalid_kmac_input_vseq
     }
   ]
 

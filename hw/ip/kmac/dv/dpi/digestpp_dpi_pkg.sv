@@ -51,7 +51,6 @@ package digestpp_dpi_pkg;
 
   import "DPI-C" context function void c_dpi_cshake128(
     input bit[7:0]          msg[],
-    input string            function_name,
     input string            customization_str,
     input longint unsigned  msg_len,
     input longint unsigned  output_len,
@@ -60,7 +59,6 @@ package digestpp_dpi_pkg;
 
   import "DPI-C" context function void c_dpi_cshake256(
     input bit[7:0]          msg[],
-    input string            function_name,
     input string            customization_str,
     input longint unsigned  msg_len,
     input longint unsigned  output_len,
@@ -72,7 +70,6 @@ package digestpp_dpi_pkg;
     input longint unsigned  msg_len,
     input bit[7:0]          key[],
     input longint unsigned  key_len,
-    input string            customization_str,
     input longint unsigned  output_len,
     output bit[7:0]         digest[]
   );
@@ -82,7 +79,6 @@ package digestpp_dpi_pkg;
     input longint unsigned  msg_len,
     input bit[7:0]          key[],
     input longint unsigned  key_len,
-    input string            customization_str,
     input longint unsigned  output_len,
     output bit[7:0]         digest[]
   );
@@ -92,7 +88,6 @@ package digestpp_dpi_pkg;
     input longint unsigned  msg_len,
     input bit[7:0]          key[],
     input longint unsigned  key_len,
-    input string            customization_str,
     input longint unsigned  output_len,
     output bit[7:0]         digest[]
   );
@@ -102,7 +97,6 @@ package digestpp_dpi_pkg;
     input longint unsigned  msg_len,
     input bit[7:0]          key[],
     input longint unsigned  key_len,
-    input string            customization_str,
     input longint unsigned  output_len,
     output bit[7:0]         digest[]
   );

@@ -71,7 +71,9 @@ class aes_base_vseq extends cip_base_vseq #(
     `uvm_info(`gfn, $sformatf("%s",txt), UVM_MEDIUM)
 
     ral.trigger.set(0);
-    ral.trigger.key_iv_data_in_clear.set(|clr_vector[2:0]);
+    ral.trigger.key_clear.set(clr_vector.key);
+    ral.trigger.iv_clear.set(clr_vector.iv);
+    ral.trigger.data_in_clear.set(clr_vector.data_in);
     ral.trigger.data_out_clear.set(clr_vector.data_out);
     csr_update(ral.trigger);
   endtask // clear_registers
@@ -365,19 +367,12 @@ class aes_base_vseq extends cip_base_vseq #(
     cfg_item = aes_item_queue.pop_back();
 
     // TODO when dut is updated to flag output overwritten
-    // the manual operation should be included in the unbalanced =1 also
-    if (new_msg) setup_dut(cfg_item);
+    // the manual operation should be included in the stress =1 also
     if (unbalanced == 0 || manual_operation) begin
       while (aes_item_queue.size() > 0) begin
-        status_fsm(cfg_item, data_item, new_msg, manual_operation, 0, status);
-        if (status.input_ready) begin
-          data_item = aes_item_queue.pop_back();
-          config_and_transmit(cfg_item, data_item, new_msg, manual_operation, 1);
-          new_msg = 0;
-        end else if (cfg_item.mode == AES_NONE) begin
-          // just write the data - don't expect and output
-          config_and_transmit(cfg_item, data_item, new_msg, manual_operation, 0);
-        end
+        data_item = aes_item_queue.pop_back();
+        config_and_transmit(cfg_item, data_item, new_msg, manual_operation, 1);
+        new_msg = 0;
       end
     end else begin
 
@@ -433,6 +428,7 @@ class aes_base_vseq extends cip_base_vseq #(
     bit                   is_blocking = cfg_item.do_b2b;
 
     if (new_msg) begin
+      setup_dut(cfg_item);
       write_data_key_iv(cfg_item, data_item.data_in);
     end else begin
       add_data(data_item.data_in, is_blocking);
@@ -477,7 +473,7 @@ class aes_base_vseq extends cip_base_vseq #(
       //read the status register to see that we have triggered the operation
       csr_rd(.ptr(ral.status), .value(status), .blocking(is_blocking));
       // check status and act accordingly //
-      if (status.alert_fatal_fault) begin
+      if (status.ctrl_error_storage) begin
         // stuck pull reset //
       end else begin
         // state 0
@@ -550,7 +546,7 @@ class aes_base_vseq extends cip_base_vseq #(
           `uvm_fatal(`gfn, $sformatf("\n\t %s",txt))
         end
         `uvm_info(`gfn, $sformatf("\n\t %s",txt), UVM_MEDIUM)
-      end // else: !if(status.alert_fatal_fault)
+      end // else: !if(status.ctrl_error_storage)
     end // while (!done)
 
   endtask // transmit_fsm

@@ -9,10 +9,10 @@ class uart_base_vseq extends cip_base_vseq #(.CFG_T               (uart_env_cfg)
   `uvm_object_utils(uart_base_vseq)
 
   // variables for dut initialization
-  rand baud_rate_e baud_rate; // set baud rate
-  rand bit en_tx;             // enable tx
+  baud_rate_e baud_rate = 9600; // set baud rate
+  bit en_tx = 1;             // enable tx
   rand bit en_rx;             // enable rx
-  rand bit en_parity;         // enable parity
+  bit en_parity = 0;         // enable parity
   rand bit odd_parity;        // enable odd parity
   rand bit en_noise_filter;   // enable noise filter
 
@@ -55,6 +55,10 @@ class uart_base_vseq extends cip_base_vseq #(.CFG_T               (uart_env_cfg)
   // setup basic uart features
   virtual task uart_init();
     int nco = get_nco(baud_rate, cfg.clk_freq_mhz, ral.ctrl.nco.get_n_bits());
+	cfg.print();
+	cfg.m_uart_agent_cfg.print();
+	`uvm_info("uart_init", $sformatf("baud_rate = %d",baud_rate), UVM_HIGH)
+	
     // cfg uart agent to set the baud rate & parity
     cfg.m_uart_agent_cfg.set_baud_rate(baud_rate);
     cfg.m_uart_agent_cfg.set_parity(en_parity, odd_parity);
@@ -129,6 +133,7 @@ class uart_base_vseq extends cip_base_vseq #(.CFG_T               (uart_env_cfg)
 
   // task to send a byte of data out of dut
   virtual task send_tx_byte(byte data);
+ 	`uvm_info(`gfn, $sformatf("send_tx_byte = 0x%x", data), UVM_HIGH) 
     csr_wr(.csr(ral.wdata), .value(data));
   endtask
 
@@ -140,13 +145,30 @@ class uart_base_vseq extends cip_base_vseq #(.CFG_T               (uart_env_cfg)
   // drive rx byte with parity_err or frame_err, data is random
   virtual task drive_rx_error_byte(bit parity_err, bit frame_err, byte data = $urandom);
     uart_seq send_rx_seq;
+	svt_uart_transaction svt_send_rx_seq;
+	`uvm_info(`gfn, "send_rx_seq on p_sequencer.uart_sequencer_h", UVM_HIGH)
     `uvm_create_on(send_rx_seq, p_sequencer.uart_sequencer_h);
     `DV_CHECK_RANDOMIZE_WITH_FATAL(send_rx_seq,
                                    data == local::data;
                                    parity_err == local::parity_err;
                                    frame_err  == local::frame_err;
                                    )
-    `uvm_send(send_rx_seq)
+	`uvm_send(send_rx_seq)
+	send_rx_seq.print(); 
+	
+/**********************/	
+	`uvm_info(`gfn, "svt_send_rx_seq on p_sequencer.dce_sequencer", UVM_HIGH)
+	`uvm_create_on(svt_send_rx_seq, p_sequencer.dce_sequencer);
+    svt_send_rx_seq.packet_count = 1;
+    svt_send_rx_seq.inter_cycle_delay = 0;
+    svt_send_rx_seq.payload = new[svt_send_rx_seq.packet_count];
+	svt_send_rx_seq.payload[0] = 0;
+	svt_send_rx_seq.payload[0] = data;
+    `uvm_send(svt_send_rx_seq)
+	svt_send_rx_seq.print();
+/***********************/	
+	`uvm_info(`gfn, "send_rx_seq finished", UVM_HIGH)
+	
   endtask : drive_rx_error_byte
 
   // task to check if byte received is what was sent by the agent

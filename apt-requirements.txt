@@ -4,10 +4,6 @@
 
 # List of packages installed with apt on our reference Ubuntu platform.
 #
-# When updating this list, please keep the yum package requirements for
-# RHEL/CentOS 7 in sync. These were derived from the Ubuntu requirements
-# and are maintained in yum-requirements.txt.
-#
 # This list of packages is also included in the documentation at
 # doc/ug/install_instructions/index.md. When updating this file also check if
 # doc/ug/install_instructions/index.md needs to be updated as well.
@@ -26,8 +22,6 @@ libelf1
 libelf-dev
 libftdi1-2
 libftdi1-dev
-# A requirement of the prebuilt clang toolchain.
-libncurses5
 libssl-dev
 libusb-1.0-0
 lsb-release

@@ -23,7 +23,7 @@ package otp_ctrl_env_pkg;
   `include "dv_macros.svh"
 
   // parameters
-  parameter string LIST_OF_ALERTS[]      = {"fatal_macro_error", "fatal_check_error"};
+  parameter string LIST_OF_ALERTS[]      = {"otp_macro_failure", "otp_check_failure"};
   parameter uint NUM_ALERTS              = 2;
 
   parameter uint DIGEST_SIZE             = 8;
@@ -117,8 +117,21 @@ package otp_ctrl_env_pkg;
     OtpCreatorSwCfgErr  = 15'b000_0000_0000_0001
   } otp_status_e;
 
-  typedef virtual mem_bkdr_if mem_bkdr_vif;
-  typedef virtual otp_ctrl_if otp_ctrl_vif;
+  typedef enum bit [1:0] {
+    OtpPwrInitReq,
+    OtpPwrIdleRsp,
+    OtpPwrDoneRsp,
+    OtpPwrIfWidth
+  } otp_pwr_if_e;
+
+  typedef virtual pins_if #(OtpPwrIfWidth) pwr_otp_vif;
+  typedef virtual pins_if #(4)             lc_creator_seed_sw_rw_en_vif;
+  typedef virtual pins_if #(4)             lc_seed_hw_rd_en_vif;
+  typedef virtual pins_if #(4)             lc_dft_en_vif;
+  typedef virtual pins_if #(4)             lc_escalate_en_vif;
+  typedef virtual pins_if #(4)             lc_check_byp_en_vif;
+  typedef virtual mem_bkdr_if              mem_bkdr_vif;
+  typedef virtual otp_ctrl_output_data_if  otp_ctrl_output_data_vif;
 
   // functions
   function automatic int get_part_index(bit [TL_DW-1:0] addr);
@@ -129,7 +142,6 @@ package otp_ctrl_env_pkg;
         break;
       end
     end
-    if (index == NumPart) index--;
     return index;
   endfunction
 
@@ -137,24 +149,6 @@ package otp_ctrl_env_pkg;
     int part_index = get_part_index(addr);
     if (part_index inside {[Secret0Idx:Secret2Idx]}) return 1;
     else return 0;
-  endfunction
-
-  function automatic bit is_sw_digest(bit [TL_DW-1:0] addr);
-    if ({addr[TL_DW-1:3], 3'b0} inside {CreatorSwCfgDigestOffset, OwnerSwCfgDigestOffset}) begin
-      return 1;
-    end else begin
-      return 0;
-    end
-  endfunction
-
-  function automatic bit is_digest(bit [TL_DW-1:0] addr);
-    if (is_sw_digest(addr)) return 1;
-    if ({addr[TL_DW-1:3], 3'b0} inside {HwCfgDigestOffset, Secret0DigestOffset,
-                                        Secret1DigestOffset, Secret2DigestOffset}) begin
-      return 1;
-    end else begin
-      return 0;
-    end
   endfunction
 
   // Resolve an offset within the software window as an offset within the whole otp_ctrl block.

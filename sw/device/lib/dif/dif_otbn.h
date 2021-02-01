@@ -61,35 +61,41 @@ typedef enum dif_otbn_result {
    * This error is recoverable and the operation can be retried after correcting
    * the problem with the argument(s).
    */
-  kDifOtbnBadArg
+  kDifOtbnBadArg,
+
+  /**
+   * The hardware returned unexpected data.
+   *
+   * This error either indicates malfunctioning hardware, or a mismatch between
+   * software and hardware.
+   */
+  kDifOtbnUnexpectedData,
 } dif_otbn_result_t;
 
 /**
- * OTBN Errors
- *
- * OTBN uses a bitfield to indicate which errors have been seen. Multiple errors
- * can be seen at the same time. This enum gives the individual bits that may be
- * set for different errors.
+ * Error codes received from the hardware.
  */
-typedef enum dif_otbn_err_bits {
-  kDifOtbnErrBitsNoError = 0,
+typedef enum dif_otbn_err_code {
+  // Keep error codes in sync with the hardware!
+  /** No error occurred. */
+  kDifOtbnErrCodeNoError = 0x0,
   /** Load or store to invalid address. */
-  kDifOtbnErrBitsBadDataAddr = (1 << 0),
+  kDifOtbnErrCodeBadDataAddr = 0x1,
   /** Instruction fetch from invalid address. */
-  kDifOtbnErrBitsBadInsnAddr = (1 << 1),
+  kDifOtbnErrCodeBadInsnAddr = 0x2,
   /** Call stack underflow or overflow. */
-  kDifOtbnErrBitsCallStack = (1 << 2),
+  kDifOtbnErrCodeCallStack = 0x3,
   /** Illegal instruction execution attempted */
-  kDifOtbnErrBitsIllegalInsn = (1 << 3),
+  kDifOtbnErrCodeIllegalInsn = 0x4,
   /** LOOP[I] related error */
-  kDifOtbnErrBitsLoop = (1 << 4),
+  kDifOtbnErrCodeLoop = 0x5,
   /** Error seen in Imem read */
-  kDifOtbnErrBitsFatalImem = (1 << 5),
+  kDifOtbnErrCodeFatalImem = 0x80,
   /** Error seen in Dmem read */
-  kDifOtbnErrBitsFatalDmem = (1 << 6),
-  /** Error seen in RF read */
-  kDifOtbnErrBitsFatalReg = (1 << 7)
-} dif_otbn_err_bits_t;
+  kDifOtbnErrCodeFatalDmem = 0x81,
+  /** Error seen in RF */
+  kDifOtbnErrCodeFatalReg = 0x82
+} dif_otbn_err_code_t;
 
 /**
  * OTBN interrupt configuration.
@@ -245,15 +251,16 @@ dif_otbn_result_t dif_otbn_start(const dif_otbn_t *otbn,
 dif_otbn_result_t dif_otbn_is_busy(const dif_otbn_t *otbn, bool *busy);
 
 /**
- * Get the error bits set by the device if the operation failed.
+ * Get the error code set by the device if the operation failed.
  *
  * @param otbn OTBN instance
- * @param[out] err_bits The error bits returned by the hardware.
+ * @param[out] err_code The error code returned by the hardware.
  * @return `kDifOtbnBadArg` if `otbn` or `err_code` is `NULL`,
+ *         `kDifOtbnUnexpectedData` if an unexpected/unknown error code is read,
  *         `kDifOtbnOk` otherwise.
  */
-dif_otbn_result_t dif_otbn_get_err_bits(const dif_otbn_t *otbn,
-                                        dif_otbn_err_bits_t *err_bits);
+dif_otbn_result_t dif_otbn_get_err_code(const dif_otbn_t *otbn,
+                                        dif_otbn_err_code_t *err_code);
 
 /**
  * Write an OTBN application into its instruction memory (IMEM)

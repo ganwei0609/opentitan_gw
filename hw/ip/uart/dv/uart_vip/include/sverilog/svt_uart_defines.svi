@@ -1,0 +1,47 @@
+`ifndef GUARD_SVT_UART_DEFINES_SVI
+`define GUARD_SVT_UART_DEFINES_SVI
+`ifndef SVT_UART
+`define SVT_UART
+`endif
+//`include "svt_defines.svi"
+
+//Enabled below macro's to defined file names having 'p' protect extension 
+`ifdef DESIGNWARE_INCDIR
+  `ifndef NVS_LIB_GEN_H
+    `define NVS_LIB_GEN_H
+  `endif
+  `ifndef NVS_LIB_GEN_VIH
+    `define NVS_LIB_GEN_VIH
+  `endif
+  `ifndef UV_PROTECT
+    `define UV_PROTECT 
+  `endif
+`endif
+
+`ifndef SVT_UART_VERSION
+`define SVT_UART_VERSION O-2018.09
+`endif
+
+`ifdef SVT_UART_INCLUDE_USER_DEFINES
+// First read in the user-specified defines (if any), that may take 
+// precedence over some of the following defaults...
+`include "svt_uart_user_defines.svi"
+`endif // SVT_UART_INCLUDE_USER_DEFINES
+
+// Read in the symbolic constants for common values used by the UART VIP.
+// Exclude these file while generating xml for CC(ConfigCreator)
+`ifndef SVDOC_CC_XML
+/** @cond PRIVATE */
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_common_define)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_chk_define)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_mon)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_chk)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_gen)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_bfm_define)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_VIH(uart_svt,O-2018.09,svt_uart_common_param)
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_define)
+/** @endcond */
+`endif
+
+`endif //  `ifndef GUARD_SVT_UART_DEFINES_SVI
+

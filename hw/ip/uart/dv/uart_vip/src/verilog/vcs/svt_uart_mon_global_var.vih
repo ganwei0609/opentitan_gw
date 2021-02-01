@@ -1,0 +1,77 @@
+// --------------------------------------------------------------------
+// variables for Summary parameters
+// --------------------------------------------------------------------
+reg    [2:0]		present_state;
+reg			baudX16;
+reg    [3:0]		mon_counter;
+reg			mon_clock;
+reg			gen_mon_clock;
+reg 			mon_clk_start;
+reg [31:0] sample_rate;
+reg [31:0] mon_sample_counter;
+reg [31:0] mon_sample_edge;
+reg 			mon_clk_i;
+reg    [8:0]		usr_payload;
+reg    [1:0]            usr_stop_bits;
+reg                     usr_start_bits;
+reg                     usr_parity_bits;
+reg    [2:0]            uv_mon_parity;
+reg    [8:0]		mon_received_data;
+reg    [12:0]		mon_received_packet;
+reg			flag;
+integer 		pkt_trans; // Packets transmitted
+integer 		pkt_rec; // Packets received
+integer 		error_count; // Errors in transactions
+integer 		warning_count; // Warnings in transactions
+integer			time_count; // Simulation time in minutes
+integer			crystal_freq;
+integer 		baud_rate;
+integer			divisor;
+integer			counter;
+integer			i;
+integer 		start_cond;
+integer			stop_cond;
+integer			stop_bits;
+integer			wait_for_dsr;
+integer			max_wait_for_start_after_dtr_assertion;
+parameter		UV_MONITOR_MODE = `UV_MON_TX_MODE;
+parameter		UV_MON_PRINT_MODE = `UV_MON_INFO_MODE;
+reg [8:0] data_pattern_xoff;
+reg [8:0] data_pattern_xon;
+reg mode_of_operation;
+
+reg [3:0] mon_data_width;
+reg [2:0] mon_stop_bits;
+reg [1:0] mon_uv_parity_bits;
+reg resync_device_receiver;
+reg resync_occured;
+reg resync_rx_at_each_byte;
+reg allow_autoflow_trigger_rx_buffer;
+//Variable to count total number of baud clock. Used for calculating bus utalization factor.
+real total_baud_clock;
+
+integer clk_counter;
+integer mon_packet_length;
+
+reg mixed_mode_mon;
+// Varaiable used to initiate the state machine task of monitor by setting it
+// to a value of 1 in the valid condition
+reg initiate_state_machine ;
+
+reg receive_half_stop_bit;
+reg half_stop_bit_rcvd;
+
+reg [31:0] temp_sample_rate;
+reg [31:0] temp_sample_rate_1;
+
+//--------------------------------------------------------------------
+reg			mon_false_start_det;
+//--------------------------------------------------------------------
+
+//vcs_vip_protect 
+`protected
+1/Be5RD/7Eg7C:#CBeIdAUWC>=N05R]^V9Z0\2M+:?J(.9,_+L.@7(Z,//WM\+D<
+)0gb#\0SGVO7*$
+`endprotected
+
+

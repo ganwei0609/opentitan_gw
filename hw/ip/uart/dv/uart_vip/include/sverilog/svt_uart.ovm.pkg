@@ -1,0 +1,56 @@
+`ifndef GUARD_SVT_UART_OVM_PKG
+ `define GUARD_SVT_UART_OVM_PKG
+  `ifndef SVT_UART
+  `define SVT_UART
+  `endif
+`ifdef DESIGNWARE_INCDIR
+  `define SVT_UART_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/common/latest/sverilog/include/svt_bootloader.svi`"
+  `include `SVT_UART_LOADER_FILE 
+  `include `SVT_SOURCE_MAP_LIB_INCLUDE_PKG(O-2018.09,svt.ovm)
+  `include `SVT_SOURCE_MAP_LIB_INCLUDE_PKG(O-2018.09,svt_bfm_shell.ovm)
+  `define SVT_UART_NVS_LOADER_FILE `"`DESIGNWARE_INCDIR/vip/svt/uart_svt/latest/sverilog/include/svt_uart_nvs_loader_utils.svi`"
+  `include `SVT_UART_NVS_LOADER_FILE 
+`else
+  // If the svt.ovm.pkg file has already been loaded, then we must still
+  // load svt_loader_util.svi so that the SVT_SOURCE_MAP_* macros can be defined correctly.
+  `include "svt.ovm.pkg"
+  `include "svt_bfm_shell.ovm.pkg"
+  `include "svt_uart_nvs_loader_utils.svi"
+`endif
+
+`include "svt_uart_if.svi"
+
+//--------------------------------------------------------------------------
+// Package svt_uart_ovm_pkg;
+//--------------------------------------------------------------------------
+package svt_uart_ovm_pkg;
+
+   import ovm_pkg::*;
+   import svt_ovm_pkg::*;
+`include "ovm_macros.svh"
+
+ import svt_bfm_shell_ovm_pkg::*;   
+   // Type Definitions
+   typedef virtual svt_uart_if svt_uart_vif;
+
+`include "svt_uart_source.ovm.svi"
+`include `SVT_SOURCE_MAP_AGENT_INCLUDE_SVI(uart_svt,uart_agent_svt,O-2018.09,svt_uart_agent_source.ovm)
+   
+endpackage : svt_uart_ovm_pkg
+ 
+`ifdef SVT_UART
+`ifndef __SVDOC__
+import svt_uart_ovm_pkg::*;
+`endif
+`endif
+
+`ifndef SVT_UART_UNIT_TEST
+`include "svt_uart_wrapper.svi"
+`endif
+
+`endif //  `ifndef GUARD_SVT_UART_OVM_PKG
+   
+//--------------------------------------------------------------------------
+//----------------------END OF FILE-----------------------------------------
+//--------------------------------------------------------------------------
+   

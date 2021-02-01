@@ -1,0 +1,19 @@
+plan svt_uart_dte_pattern_sub_plan;
+  attribute string INST_NAME="";
+  feature pattern;
+    feature cover_the_scenario_where_a_framing_error_is_followed_by_another_framing_error;
+      feature payload_seq1;
+        measure Group uart_svt;
+          source="group instance:*scenario_sequence.scenario_sequence**${INST_NAME}.framing_err_followed_by_framing_err_scenario";
+        endmeasure
+      endfeature
+    endfeature
+    feature cover_the_scenario_where_a_break_condition_is_followed_by_another_break_condition;
+      feature payload_seq2;
+        measure Group uart_svt;
+          source="group instance:*scenario_sequence.scenario_sequence**${INST_NAME}.break_followed_by_break_scenario";
+        endmeasure
+      endfeature
+    endfeature
+  endfeature
+endplan

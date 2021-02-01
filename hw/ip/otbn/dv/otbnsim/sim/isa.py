@@ -21,15 +21,6 @@ except RuntimeError as err:
     sys.exit(1)
 
 
-class DecodeError(Exception):
-    '''An error raised when trying to decode malformed instruction bits'''
-    def __init__(self, msg: str):
-        self.msg = msg
-
-    def __str__(self) -> str:
-        return 'DecodeError: {}'.format(self.msg)
-
-
 class DummyInsn(Insn):
     '''A dummy instruction that will never be decoded. Used for the insn class
     variable in the OTBNInsn base class.
@@ -102,7 +93,7 @@ class OTBNInsn:
             assert pc == old_pc
             return old_disasm
 
-        disasm = self.insn.disassemble(pc, self.op_vals)
+        disasm = self.insn.disassemble(pc, self.op_vals, 12)
         self._disasm = (pc, disasm)
         return disasm
 

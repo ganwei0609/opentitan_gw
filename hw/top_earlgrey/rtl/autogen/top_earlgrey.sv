@@ -100,28 +100,16 @@ module top_earlgrey #(
   import top_earlgrey_rnd_cnst_pkg::*;
 
   // Signals
-  logic [34:0] mio_p2d;
-  logic [34:0] mio_d2p;
-  logic [34:0] mio_d2p_en;
+  logic [31:0] mio_p2d;
+  logic [31:0] mio_d2p;
+  logic [31:0] mio_d2p_en;
   logic [14:0] dio_p2d;
   logic [14:0] dio_d2p;
   logic [14:0] dio_d2p_en;
-  // uart0
-  logic        cio_uart0_rx_p2d;
-  logic        cio_uart0_tx_d2p;
-  logic        cio_uart0_tx_en_d2p;
-  // uart1
-  logic        cio_uart1_rx_p2d;
-  logic        cio_uart1_tx_d2p;
-  logic        cio_uart1_tx_en_d2p;
-  // uart2
-  logic        cio_uart2_rx_p2d;
-  logic        cio_uart2_tx_d2p;
-  logic        cio_uart2_tx_en_d2p;
-  // uart3
-  logic        cio_uart3_rx_p2d;
-  logic        cio_uart3_tx_d2p;
-  logic        cio_uart3_tx_en_d2p;
+  // uart
+  logic        cio_uart_rx_p2d;
+  logic        cio_uart_tx_d2p;
+  logic        cio_uart_tx_en_d2p;
   // gpio
   logic [31:0] cio_gpio_gpio_p2d;
   logic [31:0] cio_gpio_gpio_d2p;
@@ -179,40 +167,16 @@ module top_earlgrey #(
   // otbn
 
 
-  logic [122:0]  intr_vector;
+  logic [98:0]  intr_vector;
   // Interrupt source list
-  logic intr_uart0_tx_watermark;
-  logic intr_uart0_rx_watermark;
-  logic intr_uart0_tx_empty;
-  logic intr_uart0_rx_overflow;
-  logic intr_uart0_rx_frame_err;
-  logic intr_uart0_rx_break_err;
-  logic intr_uart0_rx_timeout;
-  logic intr_uart0_rx_parity_err;
-  logic intr_uart1_tx_watermark;
-  logic intr_uart1_rx_watermark;
-  logic intr_uart1_tx_empty;
-  logic intr_uart1_rx_overflow;
-  logic intr_uart1_rx_frame_err;
-  logic intr_uart1_rx_break_err;
-  logic intr_uart1_rx_timeout;
-  logic intr_uart1_rx_parity_err;
-  logic intr_uart2_tx_watermark;
-  logic intr_uart2_rx_watermark;
-  logic intr_uart2_tx_empty;
-  logic intr_uart2_rx_overflow;
-  logic intr_uart2_rx_frame_err;
-  logic intr_uart2_rx_break_err;
-  logic intr_uart2_rx_timeout;
-  logic intr_uart2_rx_parity_err;
-  logic intr_uart3_tx_watermark;
-  logic intr_uart3_rx_watermark;
-  logic intr_uart3_tx_empty;
-  logic intr_uart3_rx_overflow;
-  logic intr_uart3_rx_frame_err;
-  logic intr_uart3_rx_break_err;
-  logic intr_uart3_rx_timeout;
-  logic intr_uart3_rx_parity_err;
+  logic intr_uart_tx_watermark;
+  logic intr_uart_rx_watermark;
+  logic intr_uart_tx_empty;
+  logic intr_uart_rx_overflow;
+  logic intr_uart_rx_frame_err;
+  logic intr_uart_rx_break_err;
+  logic intr_uart_rx_timeout;
+  logic intr_uart_rx_parity_err;
   logic [31:0] intr_gpio_gpio;
   logic intr_spi_device_rxf;
   logic intr_spi_device_rxlvl;
@@ -385,14 +349,8 @@ module top_earlgrey #(
   tlul_pkg::tl_d2h_t       keymgr_tl_rsp;
   tlul_pkg::tl_h2d_t       sram_ctrl_main_tl_req;
   tlul_pkg::tl_d2h_t       sram_ctrl_main_tl_rsp;
-  tlul_pkg::tl_h2d_t       uart0_tl_req;
-  tlul_pkg::tl_d2h_t       uart0_tl_rsp;
-  tlul_pkg::tl_h2d_t       uart1_tl_req;
-  tlul_pkg::tl_d2h_t       uart1_tl_rsp;
-  tlul_pkg::tl_h2d_t       uart2_tl_req;
-  tlul_pkg::tl_d2h_t       uart2_tl_rsp;
-  tlul_pkg::tl_h2d_t       uart3_tl_req;
-  tlul_pkg::tl_d2h_t       uart3_tl_rsp;
+  tlul_pkg::tl_h2d_t       uart_tl_req;
+  tlul_pkg::tl_d2h_t       uart_tl_rsp;
   tlul_pkg::tl_h2d_t       gpio_tl_req;
   tlul_pkg::tl_d2h_t       gpio_tl_rsp;
   tlul_pkg::tl_h2d_t       spi_device_tl_req;
@@ -608,7 +566,7 @@ module top_earlgrey #(
   logic        ram_main_req;
   logic        ram_main_gnt;
   logic        ram_main_we;
-  logic [14:0] ram_main_addr;
+  logic [13:0] ram_main_addr;
   logic [31:0] ram_main_wdata;
   logic [31:0] ram_main_wmask;
   logic [31:0] ram_main_rdata;
@@ -616,7 +574,7 @@ module top_earlgrey #(
   logic [1:0]  ram_main_rerror;
 
   tlul_adapter_sram #(
-    .SramAw(15),
+    .SramAw(14),
     .SramDw(32),
     .Outstanding(2)
   ) u_tl_adapter_ram_main (
@@ -638,7 +596,7 @@ module top_earlgrey #(
 
   prim_ram_1p_scr #(
     .Width(32),
-    .Depth(32768),
+    .Depth(16384),
     .CfgWidth(8)
   ) u_ram1p_ram_main (
     .clk_i   (clkmgr_clocks.clk_main_infra),
@@ -780,106 +738,28 @@ module top_earlgrey #(
 
 
 
-  uart u_uart0 (
+  uart u_uart (
 
       // Input
-      .cio_rx_i    (cio_uart0_rx_p2d),
+      .cio_rx_i    (cio_uart_rx_p2d),
 
       // Output
-      .cio_tx_o    (cio_uart0_tx_d2p),
-      .cio_tx_en_o (cio_uart0_tx_en_d2p),
+      .cio_tx_o    (cio_uart_tx_d2p),
+      .cio_tx_en_o (cio_uart_tx_en_d2p),
 
       // Interrupt
-      .intr_tx_watermark_o  (intr_uart0_tx_watermark),
-      .intr_rx_watermark_o  (intr_uart0_rx_watermark),
-      .intr_tx_empty_o      (intr_uart0_tx_empty),
-      .intr_rx_overflow_o   (intr_uart0_rx_overflow),
-      .intr_rx_frame_err_o  (intr_uart0_rx_frame_err),
-      .intr_rx_break_err_o  (intr_uart0_rx_break_err),
-      .intr_rx_timeout_o    (intr_uart0_rx_timeout),
-      .intr_rx_parity_err_o (intr_uart0_rx_parity_err),
+      .intr_tx_watermark_o  (intr_uart_tx_watermark),
+      .intr_rx_watermark_o  (intr_uart_rx_watermark),
+      .intr_tx_empty_o      (intr_uart_tx_empty),
+      .intr_rx_overflow_o   (intr_uart_rx_overflow),
+      .intr_rx_frame_err_o  (intr_uart_rx_frame_err),
+      .intr_rx_break_err_o  (intr_uart_rx_break_err),
+      .intr_rx_timeout_o    (intr_uart_rx_timeout),
+      .intr_rx_parity_err_o (intr_uart_rx_parity_err),
 
       // Inter-module signals
-      .tl_i(uart0_tl_req),
-      .tl_o(uart0_tl_rsp),
-      .clk_i (clkmgr_clocks.clk_io_div4_secure),
-      .rst_ni (rstmgr_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel])
-  );
-
-  uart u_uart1 (
-
-      // Input
-      .cio_rx_i    (cio_uart1_rx_p2d),
-
-      // Output
-      .cio_tx_o    (cio_uart1_tx_d2p),
-      .cio_tx_en_o (cio_uart1_tx_en_d2p),
-
-      // Interrupt
-      .intr_tx_watermark_o  (intr_uart1_tx_watermark),
-      .intr_rx_watermark_o  (intr_uart1_rx_watermark),
-      .intr_tx_empty_o      (intr_uart1_tx_empty),
-      .intr_rx_overflow_o   (intr_uart1_rx_overflow),
-      .intr_rx_frame_err_o  (intr_uart1_rx_frame_err),
-      .intr_rx_break_err_o  (intr_uart1_rx_break_err),
-      .intr_rx_timeout_o    (intr_uart1_rx_timeout),
-      .intr_rx_parity_err_o (intr_uart1_rx_parity_err),
-
-      // Inter-module signals
-      .tl_i(uart1_tl_req),
-      .tl_o(uart1_tl_rsp),
-      .clk_i (clkmgr_clocks.clk_io_div4_secure),
-      .rst_ni (rstmgr_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel])
-  );
-
-  uart u_uart2 (
-
-      // Input
-      .cio_rx_i    (cio_uart2_rx_p2d),
-
-      // Output
-      .cio_tx_o    (cio_uart2_tx_d2p),
-      .cio_tx_en_o (cio_uart2_tx_en_d2p),
-
-      // Interrupt
-      .intr_tx_watermark_o  (intr_uart2_tx_watermark),
-      .intr_rx_watermark_o  (intr_uart2_rx_watermark),
-      .intr_tx_empty_o      (intr_uart2_tx_empty),
-      .intr_rx_overflow_o   (intr_uart2_rx_overflow),
-      .intr_rx_frame_err_o  (intr_uart2_rx_frame_err),
-      .intr_rx_break_err_o  (intr_uart2_rx_break_err),
-      .intr_rx_timeout_o    (intr_uart2_rx_timeout),
-      .intr_rx_parity_err_o (intr_uart2_rx_parity_err),
-
-      // Inter-module signals
-      .tl_i(uart2_tl_req),
-      .tl_o(uart2_tl_rsp),
-      .clk_i (clkmgr_clocks.clk_io_div4_secure),
-      .rst_ni (rstmgr_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel])
-  );
-
-  uart u_uart3 (
-
-      // Input
-      .cio_rx_i    (cio_uart3_rx_p2d),
-
-      // Output
-      .cio_tx_o    (cio_uart3_tx_d2p),
-      .cio_tx_en_o (cio_uart3_tx_en_d2p),
-
-      // Interrupt
-      .intr_tx_watermark_o  (intr_uart3_tx_watermark),
-      .intr_rx_watermark_o  (intr_uart3_rx_watermark),
-      .intr_tx_empty_o      (intr_uart3_tx_empty),
-      .intr_rx_overflow_o   (intr_uart3_rx_overflow),
-      .intr_rx_frame_err_o  (intr_uart3_rx_frame_err),
-      .intr_rx_break_err_o  (intr_uart3_rx_break_err),
-      .intr_rx_timeout_o    (intr_uart3_rx_timeout),
-      .intr_rx_parity_err_o (intr_uart3_rx_parity_err),
-
-      // Inter-module signals
-      .tl_i(uart3_tl_req),
-      .tl_o(uart3_tl_rsp),
+      .tl_i(uart_tl_req),
+      .tl_o(uart_tl_rsp),
       .clk_i (clkmgr_clocks.clk_io_div4_secure),
       .rst_ni (rstmgr_resets.rst_sys_io_div4_n[rstmgr_pkg::Domain0Sel])
   );
@@ -966,15 +846,19 @@ module top_earlgrey #(
 
   otp_ctrl #(
     .RndCnstLfsrSeed(RndCnstOtpCtrlLfsrSeed),
-    .RndCnstLfsrPerm(RndCnstOtpCtrlLfsrPerm)
+    .RndCnstLfsrPerm(RndCnstOtpCtrlLfsrPerm),
+    .RndCnstKey(RndCnstOtpCtrlKey),
+    .RndCnstDigestConst(RndCnstOtpCtrlDigestConst),
+    .RndCnstDigestIV(RndCnstOtpCtrlDigestIV),
+    .RndCnstRawUnlockToken(RndCnstOtpCtrlRawUnlockToken)
   ) u_otp_ctrl (
 
       // Interrupt
       .intr_otp_operation_done_o (intr_otp_ctrl_otp_operation_done),
       .intr_otp_error_o          (intr_otp_ctrl_otp_error),
 
-      // [7]: fatal_macro_error
-      // [8]: fatal_check_error
+      // [7]: otp_macro_failure
+      // [8]: otp_check_failure
       .alert_tx_o  ( alert_tx[8:7] ),
       .alert_rx_i  ( alert_rx[8:7] ),
 
@@ -1017,8 +901,8 @@ module top_earlgrey #(
     .RndCnstLcKeymgrDivProduction(RndCnstLcCtrlLcKeymgrDivProduction)
   ) u_lc_ctrl (
 
-      // [9]: fatal_prog_error
-      // [10]: fatal_state_error
+      // [9]: lc_programming_failure
+      // [10]: lc_state_failure
       .alert_tx_o  ( alert_tx[10:9] ),
       .alert_rx_i  ( alert_rx[10:9] ),
 
@@ -1292,7 +1176,7 @@ module top_earlgrey #(
     .RndCnstSramNonce(RndCnstSramCtrlRetSramNonce)
   ) u_sram_ctrl_ret (
 
-      // [11]: fatal_parity_error
+      // [11]: sram_integ_alert
       .alert_tx_o  ( alert_tx[11:11] ),
       .alert_rx_i  ( alert_rx[11:11] ),
 
@@ -1376,8 +1260,8 @@ module top_earlgrey #(
     .RndCnstMskgChunkLfsrPerm(aes_pkg::RndCnstMskgChunkLfsrPermDefault)
   ) u_aes (
 
-      // [12]: recov_ctrl_update_err
-      // [13]: fatal_fault
+      // [12]: recoverable
+      // [13]: fatal
       .alert_tx_o  ( alert_tx[13:12] ),
       .alert_rx_i  ( alert_rx[13:12] ),
 
@@ -1504,7 +1388,7 @@ module top_earlgrey #(
       .intr_es_health_test_failed_o (intr_entropy_src_es_health_test_failed),
       .intr_es_fifo_err_o           (intr_entropy_src_es_fifo_err),
 
-      // [16]: recov_alert_count_met
+      // [16]: es_alert_count_met
       .alert_tx_o  ( alert_tx[16:16] ),
       .alert_rx_i  ( alert_rx[16:16] ),
 
@@ -1561,7 +1445,7 @@ module top_earlgrey #(
     .RndCnstSramNonce(RndCnstSramCtrlMainSramNonce)
   ) u_sram_ctrl_main (
 
-      // [17]: fatal_parity_error
+      // [17]: sram_integ_alert
       .alert_tx_o  ( alert_tx[17:17] ),
       .alert_rx_i  ( alert_rx[17:17] ),
 
@@ -1587,7 +1471,7 @@ module top_earlgrey #(
       .intr_done_o (intr_otbn_done),
 
       // [18]: fatal
-      // [19]: recov
+      // [19]: recoverable
       .alert_tx_o  ( alert_tx[19:18] ),
       .alert_rx_i  ( alert_rx[19:18] ),
 
@@ -1659,39 +1543,15 @@ module top_earlgrey #(
       intr_spi_device_txlvl,
       intr_spi_device_rxlvl,
       intr_spi_device_rxf,
+      intr_uart_rx_parity_err,
+      intr_uart_rx_timeout,
+      intr_uart_rx_break_err,
+      intr_uart_rx_frame_err,
+      intr_uart_rx_overflow,
+      intr_uart_tx_empty,
+      intr_uart_rx_watermark,
+      intr_uart_tx_watermark,
       intr_gpio_gpio,
-      intr_uart3_rx_parity_err,
-      intr_uart3_rx_timeout,
-      intr_uart3_rx_break_err,
-      intr_uart3_rx_frame_err,
-      intr_uart3_rx_overflow,
-      intr_uart3_tx_empty,
-      intr_uart3_rx_watermark,
-      intr_uart3_tx_watermark,
-      intr_uart2_rx_parity_err,
-      intr_uart2_rx_timeout,
-      intr_uart2_rx_break_err,
-      intr_uart2_rx_frame_err,
-      intr_uart2_rx_overflow,
-      intr_uart2_tx_empty,
-      intr_uart2_rx_watermark,
-      intr_uart2_tx_watermark,
-      intr_uart1_rx_parity_err,
-      intr_uart1_rx_timeout,
-      intr_uart1_rx_break_err,
-      intr_uart1_rx_frame_err,
-      intr_uart1_rx_overflow,
-      intr_uart1_tx_empty,
-      intr_uart1_rx_watermark,
-      intr_uart1_tx_watermark,
-      intr_uart0_rx_parity_err,
-      intr_uart0_rx_timeout,
-      intr_uart0_rx_break_err,
-      intr_uart0_rx_frame_err,
-      intr_uart0_rx_overflow,
-      intr_uart0_tx_empty,
-      intr_uart0_rx_watermark,
-      intr_uart0_tx_watermark,
       1'b 0 // For ID 0.
   };
 
@@ -1801,21 +1661,9 @@ module top_earlgrey #(
     .tl_main_i(main_tl_peri_req),
     .tl_main_o(main_tl_peri_rsp),
 
-    // port: tl_uart0
-    .tl_uart0_o(uart0_tl_req),
-    .tl_uart0_i(uart0_tl_rsp),
-
-    // port: tl_uart1
-    .tl_uart1_o(uart1_tl_req),
-    .tl_uart1_i(uart1_tl_rsp),
-
-    // port: tl_uart2
-    .tl_uart2_o(uart2_tl_req),
-    .tl_uart2_i(uart2_tl_rsp),
-
-    // port: tl_uart3
-    .tl_uart3_o(uart3_tl_req),
-    .tl_uart3_i(uart3_tl_rsp),
+    // port: tl_uart
+    .tl_uart_o(uart_tl_req),
+    .tl_uart_i(uart_tl_rsp),
 
     // port: tl_gpio
     .tl_gpio_o(gpio_tl_req),
@@ -1883,21 +1731,12 @@ module top_earlgrey #(
 
   // Pinmux connections
   assign mio_d2p = {
-    cio_uart3_tx_d2p,
-    cio_uart2_tx_d2p,
-    cio_uart1_tx_d2p,
     cio_gpio_gpio_d2p
   };
   assign mio_d2p_en = {
-    cio_uart3_tx_en_d2p,
-    cio_uart2_tx_en_d2p,
-    cio_uart1_tx_en_d2p,
     cio_gpio_gpio_en_d2p
   };
   assign {
-    cio_uart3_rx_p2d,
-    cio_uart2_rx_p2d,
-    cio_uart1_rx_p2d,
     cio_gpio_gpio_p2d
   } = mio_p2d;
 
@@ -1908,8 +1747,8 @@ module top_earlgrey #(
     1'b0, // DIO13: cio_spi_device_csb
     1'b0, // DIO12: cio_spi_device_sdi
     cio_spi_device_sdo_d2p, // DIO11
-    1'b0, // DIO10: cio_uart0_rx
-    cio_uart0_tx_d2p, // DIO9
+    1'b0, // DIO10: cio_uart_rx
+    cio_uart_tx_d2p, // DIO9
     1'b0, // DIO8: cio_usbdev_sense
     cio_usbdev_se0_d2p, // DIO7
     cio_usbdev_dp_pullup_d2p, // DIO6
@@ -1926,8 +1765,8 @@ module top_earlgrey #(
     1'b0, // DIO13: cio_spi_device_csb
     1'b0, // DIO12: cio_spi_device_sdi
     cio_spi_device_sdo_en_d2p, // DIO11
-    1'b0, // DIO10: cio_uart0_rx
-    cio_uart0_tx_en_d2p, // DIO9
+    1'b0, // DIO10: cio_uart_rx
+    cio_uart_tx_en_d2p, // DIO9
     1'b0, // DIO8: cio_usbdev_sense
     cio_usbdev_se0_en_d2p, // DIO7
     cio_usbdev_dp_pullup_en_d2p, // DIO6
@@ -1944,8 +1783,8 @@ module top_earlgrey #(
   assign cio_spi_device_csb_p2d    = dio_p2d[13]; // DIO13
   assign cio_spi_device_sdi_p2d    = dio_p2d[12]; // DIO12
   // DIO11: cio_spi_device_sdo
-  assign cio_uart0_rx_p2d          = dio_p2d[10]; // DIO10
-  // DIO9: cio_uart0_tx
+  assign cio_uart_rx_p2d           = dio_p2d[10]; // DIO10
+  // DIO9: cio_uart_tx
   assign cio_usbdev_sense_p2d      = dio_p2d[8]; // DIO8
   // DIO7: cio_usbdev_se0
   // DIO6: cio_usbdev_dp_pullup

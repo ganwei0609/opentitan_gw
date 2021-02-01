@@ -26,7 +26,7 @@ class keymgr_direct_to_disabled_vseq extends keymgr_random_vseq;
     csr_update(.csr(ral.control));
 
     wait_op_done();
-    if (get_check_en()) `DV_CHECK_EQ(current_state, keymgr_pkg::StDisabled)
+    `DV_CHECK_EQ(current_state, keymgr_pkg::StDisabled)
 
     // issue some random operations in StDisabled
     keymgr_operations();

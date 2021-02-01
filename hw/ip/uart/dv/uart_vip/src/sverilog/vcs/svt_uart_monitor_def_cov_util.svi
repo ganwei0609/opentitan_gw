@@ -1,0 +1,11 @@
+
+`ifndef GUARD_SVT_UART_MONITOR_DEF_COV_UTIL_SVI
+`define GUARD_SVT_UART_MONITOR_DEF_COV_UTIL_SVI
+
+/** @cond PRIVATE */
+
+
+/** @endcond */
+
+`endif
+

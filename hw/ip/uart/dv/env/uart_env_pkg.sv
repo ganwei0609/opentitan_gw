@@ -2,6 +2,9 @@
 // Licensed under the Apache License, Version 2.0, see LICENSE for details.
 // SPDX-License-Identifier: Apache-2.0
 
+`include "svt_uart.uvm.pkg"
+`include "uart_reset_if.svi"  
+
 package uart_env_pkg;
   // dep packages
   import uvm_pkg::*;
@@ -13,7 +16,7 @@ package uart_env_pkg;
   import dv_lib_pkg::*;
   import cip_base_pkg::*;
   import uart_ral_pkg::*;
-
+  import svt_uart_uvm_pkg::*;
   // macro includes
   `include "uvm_macros.svh"
   `include "dv_macros.svh"

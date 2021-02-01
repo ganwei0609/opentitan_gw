@@ -17,22 +17,22 @@ interface keymgr_if(input clk, input rst_n);
   keymgr_pkg::hw_key_req_t hmac_key;
   keymgr_pkg::hw_key_req_t aes_key;
 
-  keymgr_pkg::hw_key_req_t kmac_key_exp;
-  keymgr_pkg::hw_key_req_t hmac_key_exp;
-  keymgr_pkg::hw_key_req_t aes_key_exp;
+  keymgr_pkg::hw_key_req_t kmac_key_exp = '0;
+  keymgr_pkg::hw_key_req_t hmac_key_exp = '0;
+  keymgr_pkg::hw_key_req_t aes_key_exp = '0;
 
   // connect KDF interface for assertion check
   wire keymgr_pkg::kmac_data_req_t kmac_data_req;
   wire keymgr_pkg::kmac_data_rsp_t kmac_data_rsp;
 
   // indicate if check the key is same as expected or shouldn't match to any meaningful key
-  bit is_kmac_key_good;
-  bit is_hmac_key_good;
-  bit is_aes_key_good;
+  bit is_kmac_key_good = 0;
+  bit is_hmac_key_good = 0;
+  bit is_aes_key_good = 0;
 
   // when kmac sideload key is generated, kmac may be used to do other OP, but once the OP is done,
   // it should automatically switch back to sideload key
-  bit is_kmac_sideload_avail;
+  bit is_kmac_sideload_avail = 0;
   keymgr_env_pkg::key_shares_t kmac_sideload_key_shares;
 
   keymgr_env_pkg::key_shares_t keys_a_array[string][string];
@@ -55,19 +55,8 @@ interface keymgr_if(input clk, input rst_n);
     flash   = flash_ctrl_pkg::KEYMGR_FLASH_DEFAULT;
   endtask
 
-  // reset local exp variables when reset is issued
-  task automatic reset();
-    kmac_key_exp = '0;
-    hmac_key_exp = '0;
-    aes_key_exp  = '0;
-    is_kmac_key_good = 0;
-    is_hmac_key_good = 0;
-    is_aes_key_good  = 0;
-    is_kmac_sideload_avail = 0;
-  endtask
-
   // randomize otp, lc, flash input data
-  task automatic drive_random_hw_input_data(int num_invalid_input = 0);
+  task automatic drive_random_hw_input_data();
     lc_ctrl_pkg::lc_keymgr_div_t     local_keymgr_div;
     bit [keymgr_pkg::DevIdWidth-1:0] local_otp_device_id;
     otp_ctrl_pkg::otp_keymgr_key_t   local_otp_key;
@@ -76,51 +65,24 @@ interface keymgr_if(input clk, input rst_n);
     // async delay as these signals are from different clock domain
     #($urandom_range(1000, 0) * 1ns);
 
-    // randomize all data to be non all 0s or 1s
     `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_keymgr_div,
                                        !(local_keymgr_div inside {0, '1});, , msg_id)
+    keymgr_div = local_keymgr_div;
 
     `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_otp_device_id,
                                        !(local_otp_device_id inside {0, '1});, , msg_id)
+    otp_hw_cfg.data.device_id = local_otp_device_id;
 
     `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_otp_key,
                                        local_otp_key.valid == 1;
                                        !(local_otp_key.key_share0 inside {0, '1});
                                        !(local_otp_key.key_share1 inside {0, '1});, , msg_id)
+    otp_key = local_otp_key;
 
     `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_flash,
                                        foreach (local_flash.seeds[i]) {
                                          !(local_flash.seeds[i] inside {0, '1});
                                        }, , msg_id)
-
-    // make HW input to be all 0s or 1s
-    repeat (num_invalid_input) begin
-      randcase
-        1: begin
-          `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_keymgr_div,
-                                             local_keymgr_div inside {0, '1};, , msg_id)
-        end
-        1: begin
-          `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_otp_device_id,
-                                             local_otp_device_id inside {0, '1};, , msg_id)
-        end
-        1: begin
-          `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_otp_key,
-                                             local_otp_key.valid == 1; // TODO this is tie to 1
-                                             local_otp_key.key_share0 inside {0, '1} ||
-                                             local_otp_key.key_share1 inside {0, '1};, , msg_id)
-        end
-        1: begin
-          int idx = $urandom_range(0, flash_ctrl_pkg::NumSeeds - 1);
-          `DV_CHECK_STD_RANDOMIZE_WITH_FATAL(local_flash,
-                                             local_flash.seeds[idx] inside {0, '1};, , msg_id)
-        end
-      endcase
-    end
-
-    keymgr_div = local_keymgr_div;
-    otp_hw_cfg.data.device_id = local_otp_device_id;
-    otp_key = local_otp_key;
     flash   = local_flash;
   endtask
 

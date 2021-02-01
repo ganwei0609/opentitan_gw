@@ -1,0 +1,1 @@
+`define SVT_SOURCE_QUOTE_DESIGNWARE_HOME(leafname) `"/usr/synopsys/vip/leafname`"

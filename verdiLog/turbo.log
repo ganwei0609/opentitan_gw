@@ -1,0 +1,3 @@
+Command Line: /usr/synopsys/verdi/Verdi_O-2018.09-SP2/platform/LINUXAMD64/bin/Novas -full64 -ssf waves.fsdb
+uname(Linux ubuntu 4.15.0-132-generic #136-Ubuntu SMP Tue Jan 12 14:58:42 UTC 2021 x86_64)
+au time 25.855399 4.156602 1.507825 delta 233709568 233709568 total 666066944 666066944

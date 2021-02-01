@@ -1,0 +1,547 @@
+//vcs_vip_protect 
+
+//----------------------------------------------------------------------
+// PARAMETERS
+//----------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+parameter   UV_TRANS_CFG       = 16;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+parameter   UV_DEFAULT_DATA    = 9'b1010_1111_0;
+//----------------------------------------------------------------------
+// Parameter need for configuring the pool.
+//----------------------------------------------------------------------
+parameter   UV_POOL_COUNT      = 1; //This should not be changed
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+parameter   UV_TRANS_QUE_DEPTH = 2000 ;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+parameter   UV_TRANS_PKT_LEN   = UV_TRANS_CFG + UV_NVS_MAX_DATA_ARR_SIZE;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+parameter   UV_MAIN_MEM_SIZE   = 1024000;
+
+//----------------------------------------------------------------------
+// After UV_BLOCK_DOCMD_AFTER number of transation are put in the pool
+// do_cmd task will become blocking time an transaction is deleted from
+// the pool 
+//----------------------------------------------------------------------
+parameter   UV_BLOCK_DOCMD_AFTER = 2000;
+
+//--------------------------------------------------------------------
+// EVENTS
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+event 				event_trans_over;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+event				event_rts_asserted;
+event				event_rts_deasserted;
+
+event				event_cts_asserted;
+event				event_cts_deasserted;
+
+event				event_dtr_asserted;
+event				event_dtr_deasserted;
+
+event				event_dsr_asserted;
+event				event_dsr_deasserted;
+
+event				event_sout_asserted;
+event				event_sout_deasserted;
+
+event				event_sin_asserted;
+event				event_sin_deasserted;
+
+event				event_transfer_finished;
+event                           event_cts_detected;
+
+event                           event_dtr_inactive;
+event                           event_dsr_inactive;
+
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+event				event_dsr_detected;
+
+event                           event_bfm_idle; //RK
+
+
+event                           event_bfm_data_send;
+event                           event_start_pkt_send;
+
+event                           event_start_pkt_received;
+event                           event_bfm_data_received;
+event                           event_pkt_received_over;
+event                           event_pkt_send_over;
+event                           event_bfm_dsr_timeout;
+event                           event_bfm_start_after_dtr_timeout;
+event                           event_both_dtr_n_dsr_active;
+event                           event_bfm_parity_mismatch;
+event                           event_got_new_trans_from_pool;
+event                           event_bfm_break_detected;
+event                           event_bfm_invalid_stop_bits;
+event                           event_bfm_on_patrn_sent;
+event                           event_bfm_off_patrn_sent;
+event                           event_bfm_on_patrn_rcvd;
+event                           event_bfm_off_patrn_rcvd;
+
+event                           event_bfm_on_patrn_schduld;
+event                           event_bfm_off_patrn_schduld;
+//------------------------------------------------------------------
+// Events for Debuging Use, used to track asserion and deassertion of
+// RTS and CTS from specific code location.
+//------------------------------------------------------------------
+event                           event_drive_rts_high_1;
+event                           event_drive_rts_high_2;
+event                           event_drive_rts_high_3;
+event                           event_drive_rts_high_4;
+event                           event_drive_rts_high_5;
+event                           event_drive_rts_high_6;
+event                           event_drive_rts_high_7;
+event                           event_drive_rts_high_8;
+event                           event_drive_rts_high_9;
+event                           event_drive_rts_low_1;
+event                           event_drive_rts_low_2;
+event                           event_drive_rts_low_3;
+event                           event_drive_rts_low_4;
+event                           event_drive_rts_low_5;
+
+event                           event_drive_cts_high_1;
+event                           event_drive_cts_high_2;
+event                           event_drive_cts_high_3;
+event                           event_drive_cts_high_4;
+event                           event_drive_cts_high_5;
+event                           event_drive_cts_high_6;
+event                           event_drive_cts_high_7;
+event                           event_drive_cts_low_1;
+event                           event_drive_cts_low_2;
+event                           event_drive_rts_cts_high_bfr_buffer_flush;
+event                           event_drive_rts_cts_high_buffer_flush;
+//------------------------------------------------------------------
+event                           event_wait_lic_checkout;
+event                           event_lic_checkedout;
+event                           event_stop_detected;
+event                           event_start_detected;
+event                           event_data_bit_detected;
+
+reg [8:0]                       usr_bfm_data_received;
+reg [8:0]                       usr_bfm_data_send;
+reg [12:0]                      usr_pkt_received_over;
+reg [12:0]                      usr_pkt_send_over;
+reg                             usr_bfm_parity_sent;
+reg                             usr_bfm_received_parity;
+
+reg                             send_on_patrn;
+reg                             send_off_patrn;
+reg                             off_patrn_in_progress;
+reg                             on_patrn_in_progress ;
+reg                             cts_rts_deasserted_flag ;
+
+//--------------------------------------------------------------------
+// Reg Declarations
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg  				bfm_idle;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg  				mode_data;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg		  		mode_cfg_continue;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg  				break_cond;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg  				transmit_mode;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 				err_flag;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				receiver_not_ready;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				baudX16;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				tx_clock;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				rx_clock;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 				rx_clk_start;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 				rx_clk_i;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				output_data;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				curnt_break_cond;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg				curnt_cfg_continue;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg	[2:0]			parity_type;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg     [2:0]          		present_state_tx;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg     [2:0]          		present_state_rx;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+// if ((sample_rate%2) !== 0)
+//   rx_sample_edge = (sample_rate+1)/2
+// else  
+//   rx_sample_edge = sample_rate/2
+integer    sample_rate ;
+integer    rx_sample_counter;
+integer    rx_sample_edge;
+integer    temp_sample_rate;
+integer    temp_sample_rate_1;
+
+reg   [3:0]			rx_counter;
+//--------------------------------------------------------------------
+reg 				enable_rts_cts_handshake;
+//--------------------------------------------------------------------
+reg 				enable_dtr_dsr_handshake;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg	[8:0]			transmit_data;
+reg	[8:0]			data;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg	[8:0]			received_data;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg	[12:0]			received_packet;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg	[12:0]			transmit_packet;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 	[8:0]	cur_data_array [UV_NVS_MAX_DATA_ARR_SIZE-1:0];
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 	[`UV_DOERR_INDEX-1:0]	err_vector_flag;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+reg 	[`UV_DOERR_INDEX-1:0]	err_vector_val[1:0];
+//--------------------------------------------------------------------
+// array for default do_cfg values
+//--------------------------------------------------------------------
+reg 	[`UV_WIDTH_DOCFG_PVAL-1:0] docfg_pvalue[`UV_DOCFG_INDEX-1:0];
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+reg mode_band_operation;
+reg [8:0] data_pattern_inbound_off;
+reg [8:0] data_pattern_inbound_on;
+
+reg start_transmition;
+reg wait_for_xon_after_power_up;
+
+reg asrt_sout_aftr_brk_or_invld_stop_bit;
+
+reg curnt_do_err_inval_parity;
+reg curnt_do_err_inval_stop_bits ;
+reg curnt_do_err_break_condition;
+
+reg bypass_handshaking;
+reg curnt_byte_over;
+reg enable_error;
+
+reg resync_rx_at_each_byte;
+reg resync_device_receiver;
+reg allow_autoflow_trigger_rx_buffer;
+reg disable_rx_state_machine;
+reg disable_tx_state_machine;
+reg [1:0] deassert_autoflow_hndshk_before_stop_bit;
+integer pkt_cnt_to_send_xoff_pattern_bfm;
+reg [1:0] pkt_cnt_to_send_xoff_pattern_exception;
+
+//--------------------------------------------------------------------
+//
+// Integer Declartions
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer 			idle_counter;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer 			baudrate;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer 			delay;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				i;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				crystal_freq;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer 			baud_rate;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				divisor;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				counter;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				tx_counter;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer 			msg_sev_chg;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				number_of_trans_completed;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer            		cur_data_ptr;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				data_byte_for_trans;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				data_length;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				curnt_packet_count;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				curnt_sev_chg;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				curnt_file_mode_handle;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				curnt_delay;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				transmit_bytes;
+//--------------------------------------------------------------------
+integer                         curnt_transmit_byte;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				dtr_assert_time_delay;
+//--------------------------------------------------------------------
+integer                         cts_assert_time_delay;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				receiver_buffer_size;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				buffer_size;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				stop_bits;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				wait_for_dsr;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer				max_wait_for_start_after_dtr_assertion;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer                         curnt_delay_in_rts_assertion;
+//--------------------------------------------------------------------
+//
+//--------------------------------------------------------------------
+integer                         curnt_inter_cycle_delay;
+
+integer                         delay_to_flush_buffer;
+integer                         total_packet_sent;
+integer                         total_packet_rcvd;
+//----------------------------------------------------------------------
+// Variables related to pool of BFM
+//----------------------------------------------------------------------
+//This register holds the pointer of the packet that  will be stored in
+//the main memory of the pool. 
+//----------------------------------------------------------------------
+reg [63:0]                      next_pkt_pointer;
+//----------------------------------------------------------------------
+//This register holds the pointer retured by copy_pool function, i.e the
+//pointer to the next packted stored in the pool.
+//----------------------------------------------------------------------
+reg [63:0]            		copy_pkt_pointer;
+//----------------------------------------------------------------------
+//This register holds the pointer that was deleted from pool.
+//----------------------------------------------------------------------
+reg [63:0]            		delete_pkt_pointer;
+//----------------------------------------------------------------------
+//This flag is set when ever  a transaction is deleted  from pool and
+//this flag is check before a new transaction is copied from pool. If
+//the previous transaction  was deleted then next will  be copied from
+//the pool.
+//----------------------------------------------------------------------
+reg                   		previous_trans_deleted; 	
+//----------------------------------------------------------------------
+//This integer holds the length of packet copied from the pool.
+//----------------------------------------------------------------------
+integer               		pool_packet_length;
+//----------------------------------------------------------------------
+//This variable track whether False start bit is detected on the bus or not.
+//----------------------------------------------------------------------
+reg                             false_start_bit_detected;
+//----------------------------------------------------------------------
+//Specify whether to drive "baudout" pin or not.
+//----------------------------------------------------------------------
+reg                             enable_drive_baudout_pin = 1'b0;
+
+
+integer delay_to_flush_buffer_in_band;
+
+integer inter_cycle_delay;
+integer count_of_clk_tx_idle;
+integer delay_in_sout_after_dtr;
+integer delay_in_rts_assertion;
+integer delay_in_dtr_assertion;
+reg [3:0] data_width;
+reg [1:0] uv_parity_bits1;
+
+//-------------------------------------------------------------------------------
+//This variable tracks whether Mixed mode (TX and Rx Handshake is enabled or not.
+//-------------------------------------------------------------------------------
+reg                             mixed_mode;
+
+//-------------------------------------------------------------------------------
+// This variable tracks wether the bfm is active or passive
+//-------------------------------------------------------------------------------
+reg                             is_active;
+
+reg receive_half_stop_bit;
+reg half_stop_bit_rcvd;
+reg reconfig_via_task;
+
+`protected
+dNWcPC:c.+OR?-<R&6Z=Ne?&#fE@PF]X<=R\-1Uc\<?VLYCS&If<)(.8BY;)-.8@
+@Ia8cB17W-A44JKF]>I_d8@/baK/L=2U][)6^:GOGEReN,VRI:VOa\B=YKI?\/(M
+5N_:IGWDXHFP9-d:EU&GL3#-/=#VV5/YP-B@1L5(HQYaWEQbTIc[6@UD#a2[R+X>
+D2DU.LH]:FRZ>dXLVf#X^L=Z(0&1NOWZ-8b7a\EDBPNb^1-Ma.\(CM]JB:BO5GU6
+c:)B>47(G?3I0@f5R?5JI^R-+K2(A(+7?-)/VTP=@bB3REQ,bN^AT_@Sf.+(\G3X
++6-Lb:<4gHSIEAeX>W\&>^3,10>WY?N9U,b[B)[Pb,>.aWIOK7/g(-8(6&QA]Xg^
+N?RCUF&+?NTZE4?K+aQ.M.f4)^O42SQ51LT8e&ZAMN)V:=O[WO-5eRIEQ2)X.Ha-
+-=-;4#<)ERc.\]QKUAZ.8V-5];gUKP0\9DcYHK+LO:bJHS/gf7dK?5S0:RcC[USM
+JU?^.?6Jgg6QAA)Ab)9FMYZSGKGDO1H#&BOaFVbO8.>=Y&)FZeE>bgcB;M,JI=)N
+<@QU.SUTcgeAcC>M<<A&-0cTNL0E/^68O14+^&V8b-F[UH>98d:-Je1<,4H9ESO(
+aRM3;]>\^[/:]dVAI2c+GPGQJOHR?[_GYe1S8;<gF/QBIA=]BQBZ4@2;f-XETQ-L
+)H6NKAf<D#1ac4[:DHW@RXJ-P<f:gAg1N0Z^I=+f2eG-/:eg6G<@:eVKS;\FI7gI
+\?>.AU(UeY.)O8OcU#OHJP7##,dCLZQf@AcdLM-LRgd_#2T=5,;d?+@?U+;CZ-b7
+<<QS#AE+Yc&F#_6L_A#7N5F.3:@\1V:XcK=2/fL=_fNL=P&e05-#gC985a643157
+,?4IME@&bS&-G(2;;W-82)##Y,6#/[3caG>12\DRHb,UP)#,fgfD3BM/(7Ma:HNW
+KB?<-4Tc]e9C-((.UV7PY,K?E>HLKHbNc4-bAUVTPc4I5+Vb1UP29.^K>#f<^>4?
+L=CLCRXCP+Hd7<L\OCNH:BP8J8A:^-.3]/WO;Z)EI)/CBJ,KD.U7.:W/_XC4c0^.
++]?B@fIMgIN/ZER^0UB@Z9JVbZ2G>^#_Za]ZSBL.6G,1&@)@[/OS.WRgJ^C96@-L
+IP;GU88RH#(O]fDG4]a4XE(QNEY9XA<9M>F(YZEXCOG;Y=:W44+Ff6TOW,0We(E/
+6CB^53K5[D.=R^_2R2dT7YCJeU4#K9(G[&KR9Y^E(7LUVJ5V7:Q)@TX(I.cMN<E-
+-2-Q&@VS3Xge(\J6D3:<K#RVYgU.M;H1/N/9U8^3#a&Tc3f_fBX78ge\g(DM/fc+
+-f5VeTI3ZE\c489ed\EU+;,_f_OLeQV1R\DXFaa@JZWEY_fE)50]X7-(E/#@,?RA
+K]P?1I3fHC@H6\#\=[?[QTJ/_O]>NA-E#PPY>RFbNNgbNP^_1_N2,c>^R,4?):SE
+TcRQ)f+G;7\bHV;[SHa\>1ge3e:E(3]baXJA^E(A<Z/C=7\_P(+\b1T8)CVB(9@f
+c/PF9SO4@F3g?RJ\Q6P?[SA;VJ7NDEIg/a(a_A)Q1Y-BZ6HMG;?/]].Y,P(S8VGV
++<6N1?W9SJ>Z)^D.MNaX;MCB=Z0WPU,LOb>6#aE=8896^6S&78H1Q_E55A,@T.PB
+)aK6[MEXBP,CX5K<.<J&d@LfY&X<RHgVBE\V\#dBGE3A83:35cb65BaU,F1AAEB:
+O@J:1@dJgeM3ZNR5@PVGN).Nec6C[&fT4g/V.X#N4)4]@5,[U/^@<c):Ef=X8&4b
+Q[ecU9I;7c1+G5c\_EZ\]+.+7F7d;TJ90_[C@&W8YJ3Ia/J)cb[]A<<DGS_V[+OH
+Z38->,E/<&Q9FQ7eFS\=4]7FFVU^2,@2K(-<C@66b\03)C0#(cZ>WWS<[<)TE_QY
+/dN8@^W#,7)Y[fVM-<LZA3LR.9KP1=eXDS<aH4)Q6Z-J-QGfD2Na?)B]560+//@S
+KIXHXE=0>H1VV])Y-TT/3H)CU\ggKf\:-aZ0\.+>A_>P@>AIVd9\(][[_97;3B]Z
+[,[V4[J/RH:2-0NT(DW)BE/X,VBcYSKX<VggNgB0P+OFMNLN/3c]2(>:>?)^gY\&
+:<;QTM(;#d-:I/71WG;0Zb)U/gBBXbXbVfNL0J\3B_1)AY+F_X1[I8b:O.TVAX9H
+<)PRYRfF54C-LU4A6/1P1QPB=NAXG+eQI;E)]-/eCTA(?6:NW0@JB2VF=H5+>=H9
+O1Z9433/aK>e#VVU72>@R;FRCT9f?4<><?e;52]0S<aT@6\9,XO+(R>@3(R&7U\Q
+g9A94P6f9G9a[78Pd5;2B&(&6TRT1P+E9QeS9<N-SC52@Xcf8.<32NTAGIIR,a0]
+]3(_E8ASDDPLc]V>SQ^\70]54P/eeP9/>;;W8I:DJ6-NZccL9]c6)8F+F:)f-M/a
++1<RX^EVd&^aMgDBS29KRF.>>Y>?4,YQ71;W#:,B2(A-aaQT.^^2/GbQ,E\d>P&a
++=EbJSE?aX73?aMTXV9CV_E\>;J8eV#[1K);P<R8TIGg\;acK1a/)\[/B,W[=UAJ
+(AF88:4NbO#+.O5.A,cPb8Z]a6?;dc;gd]__bM;_X?b.2A9(93CYLMc+LWCSHLaW
+GSI1P+C<HB[De;TP39\3U3OX0I/G0M,2DUC,?eW./D+7c8NSDT^e4J<XZ6#,Q?I0
+&]HFZH<IG7cS2GbE8Z<U5A\_6JSID^N#?a,5UO?cUG6B2&@;cDNYGfDUT,B[R2I@
+bHS:Y]);;=5IO.+/I/4S#3Z5&ac#3R?)NPfEcg;@7gX&((-FJDVca1U<C2g7,L58
+;XEdaUcR0Y2ZUMUOa])X)1QbDI,[SB#M44.d19QgD_9H86=L9caaN6;J?LGCd(I:
+W+d:UP9+7&IA+a\efbU?K[16,ecB0e__S.T)+G1g3g)AU)BGPDXNc^07G1R>N/7H
+;aTHV[?=^0>_f?eO84/;ee.a;9XP8EI/X&OcJ9CgE6</_cMX#XRgI<^E8HS(ZdW6
+[^U&d/G@FIgX_7JVf0OJ=Q3YPVc^&);Nf[/KOeVF\B>@>b&RVd<A0>HY>BP-CcdQ
+J^^aVZ_&9F0)L)^TTd7B>LgS+M2F<_(Q=1/edJY7Lgb?=:ae.U5KT4#QT(7;CUP\
+AU:[SbBAQ=9&Z958S-_25Pc[)(IgNCe#e(G2@a2:e(9U(DY2dP-R6Bc0\3<RbIX7
+LT&WGB9d>)0N4X5c6a=L7LPNHM[f8ZOQ682</#7PG/MM_PgUNA7Vd>NS5T8La(>P
+6?^18=HEBBc&d)Vg[R.V>L=#B@1d-<IM-\P#S93J??e-_0Md02GZIQ8X_;/dM_,b
+UN6.]<R06,^g_51;+T/?<69;SD>M:?D&4e>ON2:-#W>R=Q;,IN9JLZ;[ZK=O(?X-
+Ma39f7SDS#(bL[=A,fFTNeOEM\?Q@BNQ/@/Qc]aM+_\D_F/6C/#N4(5/14\PbL9H
+e]2JL,[FPCX@RHY4d[69G7V32R^CG?Kf4VF4ed^&DZQWF=&Pdc[[fNc\J7-Y9??Z
+>^1)JHM2M,.I6#T/^Aa070Le\FIaAC)ADF_SO<BZ<GaS(MMf:Z21A86=9#2gIJBC
+,]AYQJ8F#TedP,E>;X/.N&^cc?.[R<\,BA,VfDfPPL=_SM3&0JHf.SZ1?TS>(V7B
+eDbY@&]\XOC00<3[S^T/8_]A_9cg&J>6=S3eg?DG<e,O]JI:;B0aT:=a2Cc9<bM9
+#5a9ZH.bK6aIFTCcV]XJ+5\;AdC<7X5:PW5.T3[OQWPYd)BT?;CSRe1;:FE7W^&@
+QD_N9PB+8A&HHQ-eW_.K3#RA]aA4NJE,6&GYB8/g5c65893+fVMX.?fC8+a:S@30
+7Obe/6?g2=DCaSXdI42YF^1dF3]B[<&RHSIDQ]eY3[EE5HQ5?,d]a;PL-O7C3D:V
+5<V^TH=MOOcLG;1(DY=P6^&W1bL]DR@fE8]/He73O?[DM9T\4\4RAZPLP$
+`endprotected
+

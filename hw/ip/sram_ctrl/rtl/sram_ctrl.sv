@@ -89,25 +89,30 @@ module sram_ctrl
   // Alert Sender //
   //////////////////
 
-  logic alert;
-  logic alert_test;
-  assign alert = parity_error_q;
-  assign alert_test = reg2hw.alert_test.q &
-                      reg2hw.alert_test.qe;
+  logic [NumAlerts-1:0] alerts;
+  logic [NumAlerts-1:0] alert_test;
 
-  prim_alert_sender #(
-    .AsyncOn(AlertAsyncOn[0]),
-    .IsFatal(1)
-  ) u_prim_alert_sender (
-    .clk_i,
-    .rst_ni,
-    .alert_test_i  ( alert_test    ),
-    .alert_req_i   ( alert         ),
-    .alert_ack_o   (               ),
-    .alert_state_o (               ),
-    .alert_rx_i    ( alert_rx_i[0] ),
-    .alert_tx_o    ( alert_tx_o[0] )
-  );
+  assign alerts = {
+    parity_error_q
+  };
+
+  assign alert_test = {
+    reg2hw.alert_test.q &
+    reg2hw.alert_test.qe
+  };
+
+  for (genvar k = 0; k < NumAlerts; k++) begin : gen_alert_tx
+    prim_alert_sender #(
+      .AsyncOn(AlertAsyncOn[k])
+    ) u_prim_alert_sender (
+      .clk_i,
+      .rst_ni,
+      .alert_req_i ( alerts[k] | alert_test[k] ),
+      .alert_ack_o (                 ),
+      .alert_rx_i  ( alert_rx_i[k]   ),
+      .alert_tx_o  ( alert_tx_o[k]   )
+    );
+  end
 
   //////////////////////////////////////////
   // Lifecycle Escalation Synchronization //
@@ -172,8 +177,7 @@ module sram_ctrl
   end
 
   prim_sync_reqack_data #(
-    .Width($bits(otp_ctrl_pkg::sram_otp_key_rsp_t)-1),
-    .DataSrc2Dst(1'b0)
+    .Width($bits(otp_ctrl_pkg::sram_otp_key_rsp_t)-1)
   ) u_prim_sync_reqack_data (
     .clk_src_i  ( clk_i              ),
     .rst_src_ni ( rst_ni             ),

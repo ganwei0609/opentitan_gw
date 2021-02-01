@@ -1,0 +1,26 @@
+`ifndef GUARD_SVT_UART_WRAPPER_PKG
+`define GUARD_SVT_UART_WRAPPER_PKG
+`ifndef __SVDOC__
+`ifdef SVT_UART_UNIT_TEST
+`else
+`include `NVS_SOURCE_MAP_SUITE_COMMON_H(uart_svt,O-2018.09,svt_uart_lib_gen)
+`include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_pool)
+`include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_bfm)
+`include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_checker)
+`include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_mon_txrx)
+`include `NVS_SOURCE_MAP_SUITE_MODULE_V(uart_svt,O-2018.09,svt_uart_monitor)
+//`include BFM Veridriver Files
+`ifdef UV_PROTECT
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_bfm0_driver) 
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_bfm1_driver) 
+`include `NVS_SOURCE_MAP_SUITE_INTERFACE_SV(uart_svt,O-2018.09,svt_uart_sv_mon_driver) 
+`else
+`include "svt_uart_sv_bfm0_driver.sv"
+`include "svt_uart_sv_bfm1_driver.sv"
+`include "svt_uart_sv_mon_driver.sv"
+`include "svt_uart_bfm_wrapper.sv"
+`endif
+`endif // !`ifdef SVT_UART_UNIT_TEST
+`endif //  `ifndef __SVDOC__
+`endif //  `ifndef GUARD_SVT_UART_WRAPPER_PKG
+

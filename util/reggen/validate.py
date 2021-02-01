@@ -489,13 +489,7 @@ reg_optional = {
         's',
         "tags for the register, followed by the format 'tag_name:item1:item2...'"
     ],
-    'shadowed': ['s', "'true' if the register is shadowed"],
-    'update_err_alert': ['s', "alert that will be triggered if " +
-                         "this shadowed register has update error"
-    ],
-    'storage_err_alert': ['s', "alert that will be triggered if " +
-                          "this shadowed register has storage error"
-    ]
+    'shadowed': ['s', "'true' if the register is shadowed"]
 }
 reg_added = {
     'genresval': ['pi', "reset value generated from resval and fields"],
@@ -927,7 +921,7 @@ def validate_fields(fields, rname, default_sw, default_hw, full_resval,
                     resval &= max_in_field
 
                 if (full_resval is not None and
-                   (resval != ((full_resval >> field_lsb) & max_in_field))):
+                    (resval != ((full_resval >> field_lsb) & max_in_field))):
                     error += 1
                     log.error(fname + ": Field resval " + field['resval'] +
                               " differs from value in main register resval " +
@@ -1726,18 +1720,6 @@ def validate(regs, **kwargs):
                     "{}: Consider naming each alert individually instead of "
                     "declaring an alert signal with width > 1.".format(
                         alert['name']))
-
-            # check alert naming scheme
-            if alert['name'] == "":
-                log.error("{}: Alert name cannot be empty".format(alert['name']))
-                error += 1
-            prefix = alert['name'].split('_')
-            if prefix[0] not in ['recov', 'fatal']:
-                # TODO: to be elevated to error severity
-                log.warning(
-                    "{}: Alerts must be prefixed with either 'recov_' or "
-                    "'fatal_'.".format(alert['name']))
-                # error += 1
 
         if num_alerts != 0:
             param = ''

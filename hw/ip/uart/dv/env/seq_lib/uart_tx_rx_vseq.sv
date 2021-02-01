@@ -20,7 +20,7 @@ class uart_tx_rx_vseq extends uart_base_vseq;
 
   constraint num_tx_bytes_c {
     num_tx_bytes dist {
-      1       :/ 2,
+      1       :/ 0,
       [2:10]  :/ 5,
       [11:15] :/ 5,
       [16:20] :/ 2
@@ -90,7 +90,8 @@ class uart_tx_rx_vseq extends uart_base_vseq;
       end
       begin
         // repeat test sequencing upto 50 times
-        for (int i = 1; i <= num_trans; i++) begin
+		num_trans = 1;
+		for (int i = 1; i <= num_trans; i++) begin
           // start each new run by randomizing dut parameters
           `DV_CHECK_RANDOMIZE_FATAL(this)
 
@@ -103,11 +104,11 @@ class uart_tx_rx_vseq extends uart_base_vseq;
               process_tx();
               `uvm_info(`gfn, $sformatf("done sending %0d tx bytes", num_tx_bytes), UVM_HIGH)
             end
-            begin
-              `uvm_info(`gfn, $sformatf("begin sending %0d rx bytes", num_rx_bytes), UVM_MEDIUM)
-              process_rx();
-              `uvm_info(`gfn, $sformatf("done sending %0d rx bytes", num_rx_bytes), UVM_HIGH)
-            end
+            //begin
+            //  `uvm_info(`gfn, $sformatf("begin sending %0d rx bytes", num_rx_bytes), UVM_MEDIUM)
+            //  process_rx();
+            //  `uvm_info(`gfn, $sformatf("done sending %0d rx bytes", num_rx_bytes), UVM_HIGH)
+            //end
           join
 
           process_remaining_data();
